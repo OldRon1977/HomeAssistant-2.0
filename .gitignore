@@ -1,0 +1,51 @@
+# Home Assistant spezifische Dateien die NICHT ins Git gehören
+*.log
+*.db
+*.db-shm
+*.db-wal
+.uuid
+.HA_VERSION
+.cloud/
+.storage/
+blueprints/
+deps/
+tts/
+www/
+.google.token
+secrets.yaml
+known_devices.yaml
+.ios.conf
+.spotify-token-cache
+.homekit.state
+
+# Backups
+backups/
+backup/
+*.backup
+
+# Temporary files
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# IDE/Editor files
+.vscode/settings.json
+.idea/
+
+# Custom components (optional - entscheiden Sie selbst)
+custom_components/
+
+# Add-on configs (können sensible Daten enthalten)
+addons/
+
+# HACS
+hacs/
+
+# Node modules falls vorhanden
+node_modules/
+
+# Python Cache
+__pycache__/
+*.pyc
