@@ -1,9 +1,9 @@
 # Home Assistant Konfiguration
 
 ## Setup
-1. Ihre secrets.yaml ist bereits konfiguriert ✅
-2. Bei neuen Secrets: In bestehende secrets.yaml eintragen
-3. Home Assistant neu starten nach Config-Änderungen
+1. Kopieren Sie `secrets-template.yaml` zu `secrets.yaml`
+2. Füllen Sie die Werte in `secrets.yaml` aus
+3. Starten Sie Home Assistant neu
 
 ## Datei-Struktur
 ```
