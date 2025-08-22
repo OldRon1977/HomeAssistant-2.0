@@ -1,1 +1,148 @@
-[]
+# === BLOCK: AUTOMATION_LICHT_SONNENUNTERGANG ===
+# Zweck: Alle Lichter (Wohnzimmer + Außen) bei Sonnenuntergang einschalten
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: sun.sun, switch.steckdose_1-5, switch.licht_haustur_licht_haustur
+
+- id: licht_sonnenuntergang
+  alias: "Licht - Sonnenuntergang alle an"
+  description: "Schaltet alle Lichter bei Sonnenuntergang mit 0.5s Verzögerung ein"
+  trigger:
+    - platform: sun
+      event: sunset
+  action:
+    - action: switch.turn_on
+      entity_id: switch.steckdose_1
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.steckdose_2
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.steckdose_3
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.steckdose_4
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.steckdose_5
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.licht_haustur_licht_haustur
+
+# === END BLOCK: AUTOMATION_LICHT_SONNENUNTERGANG ===
+
+# === BLOCK: AUTOMATION_LICHT_NACHTABSCHALTUNG ===
+# Zweck: Wohnzimmerlichter um 23:00 ausschalten
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: switch.steckdose_1-5
+
+- id: licht_nachtabschaltung
+  alias: "Licht - Nachtabschaltung 23:00"
+  description: "Schaltet Wohnzimmerlichter um 23:00 mit 0.5s Verzögerung aus"
+  trigger:
+    - platform: time
+      at: "23:00:00"
+  action:
+    - action: switch.turn_off
+      entity_id: switch.steckdose_1
+    - delay: 0.5
+    - action: switch.turn_off
+      entity_id: switch.steckdose_2
+    - delay: 0.5
+    - action: switch.turn_off
+      entity_id: switch.steckdose_3
+    - delay: 0.5
+    - action: switch.turn_off
+      entity_id: switch.steckdose_4
+    - delay: 0.5
+    - action: switch.turn_off
+      entity_id: switch.steckdose_5
+
+# === END BLOCK: AUTOMATION_LICHT_NACHTABSCHALTUNG ===
+
+# === BLOCK: AUTOMATION_LICHT_SONNENAUFGANG ===
+# Zweck: Außenlampe bei Sonnenaufgang ausschalten
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: sun.sun, switch.licht_haustur_licht_haustur
+
+- id: licht_sonnenaufgang
+  alias: "Licht - Sonnenaufgang Außenlampe aus"
+  description: "Schaltet Außenlampe bei Sonnenaufgang aus"
+  trigger:
+    - platform: sun
+      event: sunrise
+  action:
+    - action: switch.turn_off
+      entity_id: switch.licht_haustur_licht_haustur
+
+# === END BLOCK: AUTOMATION_LICHT_SONNENAUFGANG ===
+
+# === BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AN ===
+# Zweck: Wohnzimmerlichter um 07:00 an (nur im Winter wenn Sonnenaufgang nach 07:00)
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: sun.sun, switch.steckdose_1-5
+
+- id: licht_winter_morgen_an
+  alias: "Licht - Winter 07:00 Wohnzimmer an"
+  description: "Schaltet Wohnzimmerlichter um 07:00 ein, nur wenn Sonnenaufgang nach 07:00"
+  trigger:
+    - platform: time
+      at: "07:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}
+  action:
+    - action: switch.turn_on
+      entity_id: switch.steckdose_1
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.steckdose_2
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.steckdose_3
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.steckdose_4
+    - delay: 0.5
+    - action: switch.turn_on
+      entity_id: switch.steckdose_5
+
+# === END BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AN ===
+
+# === BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AUS ===
+# Zweck: Wohnzimmerlichter um 08:00 aus (nur im Winter wenn sie um 07:00 angingen)
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: sun.sun, switch.steckdose_1-5
+
+- id: licht_winter_morgen_aus
+  alias: "Licht - Winter 08:00 Wohnzimmer aus"
+  description: "Schaltet Wohnzimmerlichter um 08:00 aus, nur wenn Sonnenaufgang nach 07:00"
+  trigger:
+    - platform: time
+      at: "08:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}
+  action:
+    - action: switch.turn_off
+      entity_id: switch.steckdose_1
+    - delay: 0.5
+    - action: switch.turn_off
+      entity_id: switch.steckdose_2
+    - delay: 0.5
+    - action: switch.turn_off
+      entity_id: switch.steckdose_3
+    - delay: 0.5
+    - action: switch.turn_off
+      entity_id: switch.steckdose_4
+    - delay: 0.5
+    - action: switch.turn_off
+      entity_id: switch.steckdose_5
+
+# === END BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AUS ===
