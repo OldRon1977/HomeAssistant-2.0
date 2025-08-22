@@ -3,6 +3,9 @@
 *.db
 *.db-shm
 *.db-wal
+home-assistant.log*
+*.log.*
+*.fault
 .uuid
 .HA_VERSION
 .cloud/
