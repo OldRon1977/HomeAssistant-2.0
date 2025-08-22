@@ -5,6 +5,32 @@
 2. Füllen Sie die Werte in `secrets.yaml` aus
 3. Starten Sie Home Assistant neu
 
+## Implementierte Automationen
+
+### Lichtsteuerung (Automatisch)
+Intelligente Beleuchtungssteuerung basierend auf Sonnenzeiten und Tagesabläufen:
+
+**Zeitbasierte Automationen:**
+- **Sonnenuntergang:** Alle Lichter an (Wohnzimmer + Außenbereich)
+- **23:00 Uhr:** Wohnzimmerlichter aus (Nachtruhe)
+- **Sonnenaufgang:** Außenlampe aus
+- **Winter 07:00-08:00:** Morgenbeleuchtung für Kinder (nur wenn Sonnenaufgang nach 07:00)
+
+**Technische Features:**
+- 0.5s Verzögerung zwischen Schaltungen (Spannungsspitzen vermeiden)
+- Winter-Bedingung über Template-Automation
+- Moderne Home Assistant Syntax (2024+)
+
+**Entitäten:**
+- Wohnzimmerlampen: `switch.steckdose_1` bis `switch.steckdose_5`
+- Außenlampe: `switch.licht_haustur_licht_haustur`
+- Master-Button: `script.wohnzimmer_lichter_master`
+
+**Master-Button Logik:**
+- Alle aus → Alle an
+- Alle an → Alle aus  
+- Gemischt → Alle aus
+
 ## Datei-Struktur
 ```
 /config/
@@ -167,6 +193,22 @@ git add .
 git rebase --continue
 ```
 
+## Testing & Validierung
+
+### Lichtsteuerung testen
+```bash
+# Automation manuell triggern
+# Entwicklerwerkzeuge → Aktionen → automation.trigger
+# Ziel: automation.licht_sonnenuntergang
+
+# Master-Button testen  
+# Entwicklerwerkzeuge → Aktionen → script.wohnzimmer_lichter_master
+
+# Winter-Bedingung prüfen
+# Entwicklerwerkzeuge → Template:
+# {{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}
+```
+
 ## Naming Conventions
 
 ### Entitäten
@@ -228,7 +270,12 @@ git checkout v1.0-stable
 ### Status-Referenz
 - **Letzter stabiler Tag:** `git describe --tags --abbrev=0`
 - **Aktuelle Position:** `git log --oneline --decorate -5`
-- **Funktioniert:** [Manuell nach Tests aktualisieren]
+- **Implementiert:** Lichtsteuerung (2025-08-22)
+
+### Nächste geplante Features
+- Dashboard-Buttons für individuelle Lampensteuerung
+- Bewegungsmelder-Integration
+- Helligkeitssensoren für adaptive Beleuchtung
 
 ---
 
