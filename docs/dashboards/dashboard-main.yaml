@@ -1,0 +1,210 @@
+title: Home Assistant 2.0
+views:
+  - title: Beleuchtung
+    path: beleuchtung
+    icon: mdi:lightbulb-group
+    cards:
+      - type: vertical-stack
+        title: Wohnzimmer
+        cards:
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:button-card
+                entity: switch.steckdose_1
+                name: Lampe 1
+                icon: mdi:lightbulb
+                tap_action:
+                  action: toggle
+                styles:
+                  card:
+                    - height: 50px
+                    - border-radius: 8px
+                    - font-size: 14px
+                  icon:
+                    - width: 24px
+                    - height: 24px
+                state:
+                  - value: 'off'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off
+                  - value: 'on'
+                    color: '#FFC107'
+                    icon: mdi:lightbulb-on
+                  - value: 'unavailable'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off-outline
+
+              - type: custom:button-card
+                entity: switch.steckdose_2
+                name: Lampe 2
+                icon: mdi:lightbulb
+                tap_action:
+                  action: toggle
+                styles:
+                  card:
+                    - height: 50px
+                    - border-radius: 8px
+                    - font-size: 14px
+                  icon:
+                    - width: 24px
+                    - height: 24px
+                state:
+                  - value: 'off'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off
+                  - value: 'on'
+                    color: '#FFC107'
+                    icon: mdi:lightbulb-on
+                  - value: 'unavailable'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off-outline
+
+              - type: custom:button-card
+                entity: switch.steckdose_3
+                name: Lampe 3
+                icon: mdi:lightbulb
+                tap_action:
+                  action: toggle
+                styles:
+                  card:
+                    - height: 50px
+                    - border-radius: 8px
+                    - font-size: 14px
+                  icon:
+                    - width: 24px
+                    - height: 24px
+                state:
+                  - value: 'off'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off
+                  - value: 'on'
+                    color: '#FFC107'
+                    icon: mdi:lightbulb-on
+                  - value: 'unavailable'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off-outline
+
+              - type: custom:button-card
+                entity: switch.steckdose_4
+                name: Lampe 4
+                icon: mdi:lightbulb
+                tap_action:
+                  action: toggle
+                styles:
+                  card:
+                    - height: 50px
+                    - border-radius: 8px
+                    - font-size: 14px
+                  icon:
+                    - width: 24px
+                    - height: 24px
+                state:
+                  - value: 'off'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off
+                  - value: 'on'
+                    color: '#FFC107'
+                    icon: mdi:lightbulb-on
+                  - value: 'unavailable'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off-outline
+
+              - type: custom:button-card
+                entity: switch.steckdose_5
+                name: Lampe 5
+                icon: mdi:lightbulb
+                tap_action:
+                  action: toggle
+                styles:
+                  card:
+                    - height: 50px
+                    - border-radius: 8px
+                    - font-size: 14px
+                  icon:
+                    - width: 24px
+                    - height: 24px
+                state:
+                  - value: 'off'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off
+                  - value: 'on'
+                    color: '#FFC107'
+                    icon: mdi:lightbulb-on
+                  - value: 'unavailable'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off-outline
+
+              - type: custom:button-card
+                entity: script.wohnzimmer_lichter_master
+                name: Alle Lampen
+                icon: mdi:lightbulb-group
+                triggers_update:
+                  - switch.steckdose_1
+                  - switch.steckdose_2
+                  - switch.steckdose_3
+                  - switch.steckdose_4
+                  - switch.steckdose_5
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  service_data:
+                    entity_id: script.wohnzimmer_lichter_master
+                styles:
+                  card:
+                    - height: 50px
+                    - border-radius: 8px
+                    - font-weight: bold
+                    - font-size: 14px
+                  icon:
+                    - width: 24px
+                    - height: 24px
+                state:
+                  - value: 'unavailable'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-group-off
+                  - operator: template
+                    value: >
+                      [[[
+                        const lampen = ['switch.steckdose_1', 'switch.steckdose_2', 'switch.steckdose_3', 'switch.steckdose_4', 'switch.steckdose_5'];
+                        const anLampen = lampen.filter(lampe => states[lampe].state === 'on');
+                        return anLampen.length > 0;
+                      ]]]
+                    color: '#FFC107'
+                    icon: mdi:lightbulb-group
+                  - operator: default
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-group-off
+
+      - type: vertical-stack
+        title: Außenbereich
+        cards:
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:button-card
+                entity: switch.licht_haustur_licht_haustur
+                name: Außenlampe Tür
+                icon: mdi:lightbulb
+                tap_action:
+                  action: toggle
+                styles:
+                  card:
+                    - height: 50px
+                    - border-radius: 8px
+                    - font-size: 14px
+                  icon:
+                    - width: 24px
+                    - height: 24px
+                state:
+                  - value: 'off'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off
+                  - value: 'on'
+                    color: '#FFC107'
+                    icon: mdi:lightbulb-on
+                  - value: 'unavailable'
+                    color: '#546E7A'
+                    icon: mdi:lightbulb-off-outline
