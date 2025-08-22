@@ -1,0 +1,99 @@
+# ===============================================================================
+# SICHERE INTEGRATIONEN ÜBERSICHT - Copy&Paste in Entwicklerwerkzeuge > Template
+# Nur sichere Attribute, die bei allen Entitäten funktionieren
+# ===============================================================================
+
+{%- set domains = states | map(attribute='domain') | unique | sort | list %}
+
+SYSTEM ÜBERSICHT:
+=================
+Anzahl aktive Domains: {{ domains | count }}
+Letzte Aktualisierung: {{ now().strftime('%Y-%m-%d %H:%M:%S') }}
+
+ALLE DOMAINS/INTEGRATIONEN:
+==========================
+{%- for domain in domains %}
+{{ domain }} ({{ states[domain] | count }} Entitäten)
+{%- endfor %}
+
+ESPHOME GERÄTE:
+==============
+{%- for entity in states if 'esphome' in entity.entity_id.lower() or 'esp' in entity.entity_id.lower() or 'bewcmp' in entity.entity_id.lower() %}
+{{ entity.entity_id }} | {{ entity.attributes.get('friendly_name', entity.name) }} | {{ entity.state }}
+{%- else %}
+Keine ESPHome-Entitäten gefunden
+{%- endfor %}
+
+ZIGBEE GERÄTE:
+=============
+{%- for entity in states if 'zigbee' in entity.entity_id.lower() or 'zha' in entity.entity_id.lower() %}
+{{ entity.entity_id }} | {{ entity.attributes.get('friendly_name', entity.name) }} | {{ entity.state }}
+{%- else %}
+Keine Zigbee-Entitäten gefunden
+{%- endfor %}
+
+MQTT GERÄTE:
+===========
+{%- for entity in states if 'mqtt' in entity.entity_id.lower() %}
+{{ entity.entity_id }} | {{ entity.attributes.get('friendly_name', entity.name) }} | {{ entity.state }}
+{%- else %}
+Keine MQTT-Entitäten gefunden
+{%- endfor %}
+
+SENSORS:
+========
+Anzahl Sensoren: {{ states.sensor | count }}
+{%- for entity in states.sensor | list %}
+{%- if loop.index <= 5 %}
+{{ entity.entity_id }} | {{ entity.state }}{% if entity.attributes.get('unit_of_measurement') %} {{ entity.attributes.unit_of_measurement }}{% endif %}
+{%- endif %}
+{%- endfor %}
+{%- if states.sensor | count > 5 %}
+... und {{ states.sensor | count - 5 }} weitere Sensoren
+{%- endif %}
+
+LIGHTS:
+=======
+{%- if states.light | count > 0 %}
+Anzahl Lichter: {{ states.light | count }}
+{%- for entity in states.light | list %}
+{%- if loop.index <= 3 %}
+{{ entity.entity_id }} | {{ entity.state }}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+Keine Lichter gefunden
+{%- endif %}
+
+SWITCHES:
+=========
+{%- if states.switch | count > 0 %}
+Anzahl Schalter: {{ states.switch | count }}
+{%- for entity in states.switch | list %}
+{%- if loop.index <= 3 %}
+{{ entity.entity_id }} | {{ entity.state }}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+Keine Schalter gefunden
+{%- endif %}
+
+BINARY SENSORS:
+===============
+{%- if states.binary_sensor | count > 0 %}
+Anzahl Binärsensoren: {{ states.binary_sensor | count }}
+{%- for entity in states.binary_sensor | list %}
+{%- if loop.index <= 3 %}
+{{ entity.entity_id }} | {{ entity.state }}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+Keine Binärsensoren gefunden
+{%- endif %}
+
+CUSTOM/ADD-ON DOMAINS:
+=====================
+{%- set standard_domains = ['sensor', 'binary_sensor', 'light', 'switch', 'automation', 'script', 'scene', 'input_boolean', 'input_number', 'input_select', 'input_text', 'input_datetime', 'timer', 'counter', 'device_tracker', 'person', 'zone', 'sun', 'weather', 'climate', 'fan', 'cover', 'lock', 'camera', 'media_player', 'notify', 'persistent_notification', 'group', 'homeassistant', 'update', 'button'] %}
+{%- for domain in domains if domain not in standard_domains %}
+{{ domain }} ({{ states[domain] | count }}) - Custom/Add-on Integration
+{%- endfor %}

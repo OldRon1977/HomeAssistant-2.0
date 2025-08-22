@@ -1,0 +1,77 @@
+version: 4
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://core-mosquitto:1883
+  user: addons
+  password: phee8angahki4tooThahShe8ahzai1ooheiv7oopaip1hij5pamuth8aef4xaich
+serial:
+  adapter: zstack
+  baudrate: 115200
+  rtscts: false
+  port: /dev/ttyUSB0
+advanced:
+  log_level: info
+  channel: 11
+  network_key:
+    - 172
+    - 235
+    - 75
+    - 243
+    - 90
+    - 39
+    - 149
+    - 87
+    - 35
+    - 237
+    - 207
+    - 148
+    - 49
+    - 71
+    - 188
+    - 6
+  pan_id: 51315
+  ext_pan_id:
+    - 62
+    - 171
+    - 218
+    - 182
+    - 153
+    - 180
+    - 130
+    - 191
+frontend:
+  enabled: true
+  port: 8099
+homeassistant:
+  enabled: true
+devices:
+  '0xa4c1382a30684902':
+    friendly_name: Steckdose 23 - Wasserenthaerter
+  '0xa4c138c68ac4d901':
+    friendly_name: Steckdose 21 - Waschmaschine
+  '0xa4c138e58f19e29c':
+    friendly_name: Steckdose 22 - Trockner
+  '0xa4c138205641666b':
+    friendly_name: Steckdose 34 - TP-Link Switch
+  '0xa4c13826d9ccae04':
+    friendly_name: Steckdose 32 - Kaffeemaschine
+  '0xa4c138f3768beb15':
+    friendly_name: Steckdose 31 - Heizung
+  '0xa4c1389e0a7a0dce':
+    friendly_name: Steckdose 28 - Bett Tiger
+  '0xa4c1388892a84093':
+    friendly_name: Steckdose 29 - Bett Schnuck
+  '0xa4c138d96751882c':
+    friendly_name: Steckdose 33 - Konsolen
+  '0xa4c1383561543847':
+    friendly_name: Steckdose 35 - Wohnmobil
+  '0xa4c138aa870846c4':
+    friendly_name: Steckdose 25 - Schwimmbad
+  '0xa4c138c03ef9ada8':
+    friendly_name: Steckdose 27 - Franke Chiller
+  '0xa4c13825c593d849':
+    friendly_name: Steckdose 26 - Franke Heisswasser
+  '0xa4c138a0970f59c4':
+    friendly_name: Steckdose 30 - Spuelmaschine
+  '0xa4c138113f7ad8b2':
+    friendly_name: Steckdose 24 - TV Nähzimmer

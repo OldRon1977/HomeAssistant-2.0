@@ -1,0 +1,94 @@
+# ===============================================================================
+# ENTITÄTEN ÜBERSICHT - Copy&Paste in Entwicklerwerkzeuge > Template
+# Funktionsfähige Version mit verfügbaren Attributen
+# ===============================================================================
+
+{%- set domains = states | groupby('domain') | list %}
+{%- set total_entities = states | count %}
+
+SYSTEM ÜBERSICHT:
+=================
+Gesamtanzahl Entitäten: {{ total_entities }}
+Anzahl Domains: {{ domains | count }}
+Letzte Aktualisierung: {{ now().strftime('%Y-%m-%d %H:%M:%S') }}
+
+DOMAINS IM SYSTEM:
+==================
+{%- for domain, entities in domains %}
+{{ domain }} ({{ entities | count }} Entitäten)
+{%- endfor %}
+
+ENTITÄTEN NACH DOMAIN:
+=====================
+{%- for domain, entities in domains %}
+
+{{ domain.upper() }} ({{ entities | count }} Entitäten)
+{{ "=" * (domain | length + entities | count | string | length + 12) }}
+{%- for entity in entities | sort(attribute='entity_id') %}
+• {{ entity.entity_id }}
+  Name: {{ entity.name or 'Kein Name' }}
+  Anzeigename: {{ entity.attributes.get('friendly_name', 'Nicht gesetzt') }}
+  Zustand: {{ entity.state }}
+  {%- if entity.attributes.get('unit_of_measurement') %}
+  Einheit: {{ entity.attributes.unit_of_measurement }}
+  {%- endif %}
+  {%- if entity.attributes.get('device_class') %}
+  Geräte-Klasse: {{ entity.attributes.device_class }}
+  {%- endif %}
+  Verfügbar: {{ 'Ja' if entity.state != 'unavailable' and entity.state != 'unknown' else 'Nein' }}
+  {%- if entity.attributes.get('supported_features') %}
+  Features: {{ entity.attributes.supported_features }}
+  {%- endif %}
+  {%- if entity.attributes.get('icon') %}
+  Icon: {{ entity.attributes.icon }}
+  {%- endif %}
+  {%- if entity.attributes.get('entity_category') %}
+  Kategorie: {{ entity.attributes.entity_category }}
+  {%- endif %}
+  Letzte Änderung: {{ entity.last_changed.strftime('%Y-%m-%d %H:%M:%S') }}
+  {%- if entity.attributes.get('battery_level') %}
+  Batterie: {{ entity.attributes.battery_level }}%
+  {%- endif %}
+  {%- if entity.attributes.get('temperature') %}
+  Temperatur: {{ entity.attributes.temperature }}°C
+  {%- endif %}
+  {%- if entity.attributes.get('brightness') %}
+  Helligkeit: {{ entity.attributes.brightness }}/255
+  {%- endif %}
+  {%- if entity.attributes.get('current_temperature') %}
+  Aktuelle Temperatur: {{ entity.attributes.current_temperature }}°C
+  {%- endif %}
+  {%- if entity.attributes.get('target_temperature') %}
+  Ziel-Temperatur: {{ entity.attributes.target_temperature }}°C
+  {%- endif %}
+  {%- if entity.attributes.get('hvac_mode') %}
+  HVAC Modus: {{ entity.attributes.hvac_mode }}
+  {%- endif %}
+  {%- if entity.attributes.get('hvac_modes') %}
+  HVAC Modi: {{ entity.attributes.hvac_modes | join(', ') }}
+  {%- endif %}
+  ---
+{%- endfor %}
+
+{% endfor %}
+
+SENSOREN MIT WERTEN:
+===================
+{%- for entity in states.sensor %}
+{{ entity.entity_id }} | {{ entity.attributes.get('friendly_name', entity.name) }} | {{ entity.state }}{% if entity.attributes.get('unit_of_measurement') %} {{ entity.attributes.unit_of_measurement }}{% endif %}
+{%- endfor %}
+
+LIGHTS & SWITCHES:
+==================
+{%- for entity in states.light %}
+{{ entity.entity_id }} | {{ entity.attributes.get('friendly_name', entity.name) }} | {{ entity.state }}
+{%- endfor %}
+{%- for entity in states.switch %}
+{{ entity.entity_id }} | {{ entity.attributes.get('friendly_name', entity.name) }} | {{ entity.state }}
+{%- endfor %}
+
+BINARY SENSOREN:
+===============
+{%- for entity in states.binary_sensor %}
+{{ entity.entity_id }} | {{ entity.attributes.get('friendly_name', entity.name) }} | {{ entity.state }}
+{%- endfor %}
