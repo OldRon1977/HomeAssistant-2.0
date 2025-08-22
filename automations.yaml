@@ -1,6 +1,6 @@
 # === BLOCK: AUTOMATION_LICHT_SONNENUNTERGANG ===
 # Zweck: Alle Lichter (Wohnzimmer + Außen) bei Sonnenuntergang einschalten
-# Status: 🔄 Neu
+# Status: ✅ Getestet
 # Erstellt: 2025-08-22
 # Abhängigkeiten: sun.sun, switch.steckdose_1-5, switch.licht_haustur_licht_haustur
 
@@ -33,7 +33,7 @@
 
 # === BLOCK: AUTOMATION_LICHT_NACHTABSCHALTUNG ===
 # Zweck: Wohnzimmerlichter um 23:00 ausschalten
-# Status: 🔄 Neu
+# Status: ✅ Getestet
 # Erstellt: 2025-08-22
 # Abhängigkeiten: switch.steckdose_1-5
 
@@ -63,7 +63,7 @@
 
 # === BLOCK: AUTOMATION_LICHT_SONNENAUFGANG ===
 # Zweck: Außenlampe bei Sonnenaufgang ausschalten
-# Status: 🔄 Neu
+# Status: ✅ Getestet
 # Erstellt: 2025-08-22
 # Abhängigkeiten: sun.sun, switch.licht_haustur_licht_haustur
 
@@ -81,7 +81,7 @@
 
 # === BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AN ===
 # Zweck: Wohnzimmerlichter um 07:00 an (nur im Winter wenn Sonnenaufgang nach 07:00)
-# Status: 🔄 Neu
+# Status: ✅ Getestet
 # Erstellt: 2025-08-22
 # Abhängigkeiten: sun.sun, switch.steckdose_1-5
 
@@ -114,7 +114,7 @@
 
 # === BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AUS ===
 # Zweck: Wohnzimmerlichter um 08:00 aus (nur im Winter wenn sie um 07:00 angingen)
-# Status: 🔄 Neu
+# Status: ✅ Getestet
 # Erstellt: 2025-08-22
 # Abhängigkeiten: sun.sun, switch.steckdose_1-5
 
@@ -144,3 +144,45 @@
       entity_id: switch.steckdose_5
 
 # === END BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AUS ===
+
+# === BLOCK: AUTOMATION_KRITISCHE_INFRASTRUKTUR ===
+# Zweck: Hält lebensnotwendige Geräte immer eingeschaltet (Stromausfall-Schutz)
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Trigger: Alle 5min + HA-Start (Stromausfall-Recovery)
+# Abhängigkeiten: 12 kritische Switches (Kühlschränke, Heizung, Technik)
+# Wichtig: Verhindert Lebensmittelverderb und kalte Wohnung im Winter
+
+- id: kritische_infrastruktur_immer_an
+  alias: "Kritische Infrastruktur - Immer An"
+  description: "Stellt sicher, dass kritische Geräte nach Stromausfall wieder eingeschaltet werden"
+  trigger:
+    # Jede Minute prüfen
+    - trigger: time_pattern
+      minutes: "/1"
+    # Nach Home Assistant Start (Stromausfall-Recovery)
+    - trigger: homeassistant
+      event: start
+  action:
+    # Alle kritischen Switches einschalten (idempotent)
+    - action: switch.turn_on
+      target:
+        entity_id:
+          # Kühlgeräte - KRITISCH für Lebensmittel
+          - switch.kuhlschrank
+          - switch.kuhlschrank_keller
+          - switch.froster_kuche
+          # Wasser/Heizung - KRITISCH für Wohnen
+          - switch.steckdose_31_heizung
+          - switch.steckdose_23_wasserenthaerter
+          - switch.steckdose_26_franke_heisswasser
+          - switch.steckdose_27_franke_chiller
+          # Haushaltsgeräte - WICHTIG für Alltag
+          - switch.steckdose_21_waschmaschine
+          - switch.steckdose_22_trockner
+          - switch.steckdose_30_spuelmaschine
+          # Technik-Infrastruktur - KRITISCH für System
+          - switch.steckdose_34_tp_link_switch
+          - switch.espsomfy
+
+# === END BLOCK: AUTOMATION_KRITISCHE_INFRASTRUKTUR ===
