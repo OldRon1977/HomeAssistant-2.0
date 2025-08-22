@@ -1,0 +1,454 @@
+esphome:
+  name: bewcmp
+  friendly_name: Bewässerungscomputer
+  on_boot:
+    priority: -100
+    then:
+      - logger.log: "Bewässerungscomputer gestartet"
+      - delay: 2s
+      - if:
+          condition:
+            wifi.connected:
+          then:
+            - logger.log: "WiFi verbunden bei Boot"
+          else:
+            - logger.log: "WiFi nicht verbunden"
+
+esp8266:
+  board: esp01_1m
+  restore_from_flash: true
+
+logger:
+  level: INFO
+
+api:
+  encryption:
+    key: "f6CdeAdZDQmmGAbbWELJbAgZkPwB/HnIYVl4eaWo7bM="
+  reboot_timeout: 15min
+
+ota:
+  platform: esphome
+  password: "31f98489b638f61be7db9795f8a6c652"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: 192.168.2.76
+    gateway: 192.168.2.1
+    subnet: 255.255.255.0
+    dns1: 192.168.2.1
+  
+  fast_connect: true
+  power_save_mode: none
+  reboot_timeout: 30min
+  
+  ap:
+    ssid: "Bewcmp Fallback"
+    password: "Aerthun0815!"
+
+captive_portal:
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: Europe/Amsterdam
+    servers:
+      - 192.168.2.1
+      - pool.ntp.org
+    on_time_sync:
+      then:
+        - logger.log: "Zeit synchronisiert"
+
+globals:
+  - id: wifi_reconnect_count
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  
+  - id: total_water_time_today
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  
+  - id: last_watering_timestamp
+    type: time_t
+    restore_value: yes
+    initial_value: '0'
+
+interval:
+  - interval: 30s
+    then:
+      - if:
+          condition:
+            not:
+              wifi.connected:
+          then:
+            - logger.log: "WiFi getrennt"
+            - lambda: |-
+                id(wifi_reconnect_count) += 1;
+  
+  - interval: 60s
+    then:
+      - if:
+          condition:
+            or:
+              - lambda: 'return id(zone_1_relay).state;'
+              - lambda: 'return id(zone_2_relay).state;'
+          then:
+            - lambda: |-
+                id(total_water_time_today) += 60;
+  
+  - interval: 60s
+    then:
+      - if:
+          condition:
+            lambda: |-
+              auto time = id(sntp_time).now();
+              return time.hour == 0 && time.minute == 0;
+          then:
+            - logger.log: "Täglicher Reset der Zähler"
+            - lambda: |-
+                id(total_water_time_today) = 0;
+
+switch:
+  - platform: gpio
+    name: "Zone 1 Relais"
+    pin: GPIO3
+    id: zone_1_relay
+    restore_mode: ALWAYS_OFF
+    internal: true
+    on_turn_on:
+      - lambda: |-
+          id(last_watering_timestamp) = id(sntp_time).now().timestamp;
+  
+  - platform: gpio
+    name: "Zone 2 Relais"
+    pin: GPIO4
+    id: zone_2_relay
+    restore_mode: ALWAYS_OFF
+    internal: true
+    on_turn_on:
+      - lambda: |-
+          id(last_watering_timestamp) = id(sntp_time).now().timestamp;
+
+sensor:
+  # KORRIGIERT: WiFi-Signal in dBm mit korrekter device_class
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_signal_db
+    unit_of_measurement: "dBm"
+    device_class: signal_strength
+    state_class: measurement
+    update_interval: 60s
+    entity_category: "diagnostic"
+    accuracy_decimals: 0
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return x < -80;'
+            then:
+              - logger.log: 
+                  format: "Schwaches WiFi Signal: %.0f dBm"
+                  args: ['x']
+  
+  # KORRIGIERT: WiFi-Signal in Prozent OHNE device_class (verhindert Warnung)
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Signal Prozent"
+    unit_of_measurement: "%"
+    # WICHTIG: Keine device_class für Prozent-Anzeige!
+    state_class: measurement
+    entity_category: "diagnostic"
+    accuracy_decimals: 0
+    filters:
+      # Verbesserte realistische dBm zu Prozent Konvertierung
+      - lambda: |-
+          // Realistische WiFi-Bereiche:
+          // -30 dBm = Excellent (100%)
+          // -50 dBm = Very Good (85%)
+          // -60 dBm = Good (70%)
+          // -70 dBm = Fair (50%)
+          // -80 dBm = Weak (25%)
+          // -90 dBm = Very Weak (0%)
+          
+          float dbm = x;
+          if (dbm >= -30) return 100.0;
+          if (dbm <= -90) return 0.0;
+          
+          // Nicht-lineare Konvertierung für realistischere Werte
+          if (dbm >= -50) return 85.0 + (dbm + 50) * 0.75;      // -30 bis -50: 85-100%
+          if (dbm >= -60) return 70.0 + (dbm + 60) * 1.5;       // -50 bis -60: 70-85%
+          if (dbm >= -70) return 50.0 + (dbm + 70) * 2.0;       // -60 bis -70: 50-70%
+          if (dbm >= -80) return 25.0 + (dbm + 80) * 2.5;       // -70 bis -80: 25-50%
+          
+          return (dbm + 90) * 2.5;                               // -80 bis -90: 0-25%
+  
+  - platform: uptime
+    name: "Betriebszeit Sekunden"
+    id: uptime_sensor
+    update_interval: 60s
+    internal: true
+  
+  - platform: template
+    name: "WiFi Reconnects"
+    lambda: |-
+      return id(wifi_reconnect_count);
+    update_interval: 60s
+    entity_category: "diagnostic"
+  
+  - platform: template
+    name: "Bewässerungszeit heute"
+    lambda: |-
+      return id(total_water_time_today) / 60.0;
+    unit_of_measurement: "min"
+    accuracy_decimals: 1
+    update_interval: 60s
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Adresse"
+      entity_category: "diagnostic"
+    ssid:
+      name: "WiFi SSID"
+      entity_category: "diagnostic"
+  
+  - platform: version
+    name: "ESPHome Version"
+    entity_category: "diagnostic"
+  
+  - platform: template
+    name: "Betriebszeit formatiert"
+    lambda: |-
+      int seconds = round(id(uptime_sensor).raw_state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds / 60;
+      std::string result = "";
+      if (days > 0) result += to_string(days) + "d ";
+      if (hours > 0) result += to_string(hours) + "h ";
+      result += to_string(minutes) + "m";
+      return optional<std::string>(result);
+    icon: mdi:clock-start
+    update_interval: 60s
+    entity_category: "diagnostic"
+  
+  - platform: template
+    name: "Bewässerungsstatus"
+    lambda: |-
+      if (id(garden_sprinkler_ctrlr).active_valve().has_value()) {
+        int valve = id(garden_sprinkler_ctrlr).active_valve().value();
+        return optional<std::string>("Zone " + to_string(valve + 1) + " aktiv");
+      } else if (id(garden_sprinkler_ctrlr).paused_valve().has_value()) {
+        return optional<std::string>("Pausiert");
+      } else {
+        return optional<std::string>("Bereit");
+      }
+    update_interval: 5s
+    icon: mdi:information-outline
+  
+  - platform: template
+    name: "Letzte Bewässerung"
+    lambda: |-
+      if (id(last_watering_timestamp) == 0) {
+        return optional<std::string>("Noch nie");
+      }
+      time_t now = id(sntp_time).now().timestamp;
+      int diff = now - id(last_watering_timestamp);
+      if (diff < 3600) {
+        return optional<std::string>("Vor " + to_string(diff / 60) + " Minuten");
+      } else if (diff < 86400) {
+        return optional<std::string>("Vor " + to_string(diff / 3600) + " Stunden");
+      } else {
+        return optional<std::string>("Vor " + to_string(diff / 86400) + " Tagen");
+      }
+    update_interval: 60s
+    icon: mdi:clock-outline
+  
+  # NEU: WiFi-Qualität als Text
+  - platform: template
+    name: "WiFi Qualität"
+    lambda: |-
+      float signal = id(wifi_signal_db).state;
+      if (signal >= -30) return {"Ausgezeichnet"};
+      if (signal >= -50) return {"Sehr gut"};
+      if (signal >= -60) return {"Gut"};
+      if (signal >= -70) return {"Akzeptabel"};
+      if (signal >= -80) return {"Schwach"};
+      return {"Sehr schwach"};
+    icon: "mdi:wifi"
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+binary_sensor:
+  - platform: template
+    name: "Zone 1 aktiv"
+    lambda: |-
+      return id(garden_sprinkler_ctrlr).active_valve().value_or(-1) == 0;
+    device_class: running
+  
+  - platform: template
+    name: "Zone 2 aktiv"
+    lambda: |-
+      return id(garden_sprinkler_ctrlr).active_valve().value_or(-1) == 1;
+    device_class: running
+  
+  - platform: template
+    name: "System bereit"
+    lambda: |-
+      return !id(garden_sprinkler_ctrlr).active_valve().has_value();
+    device_class: running
+    icon: mdi:check-circle
+  
+  - platform: status
+    name: "WiFi Status"
+    id: wifi_connected
+    internal: true
+
+button:
+  - platform: restart
+    name: "Neustart"
+    entity_category: "diagnostic"
+  
+  - platform: template
+    name: "NOTFALL STOP"
+    icon: mdi:stop-circle
+    entity_category: "config"
+    on_press:
+      - sprinkler.shutdown: garden_sprinkler_ctrlr
+      - logger.log: 
+          level: WARN
+          format: "NOTFALL STOP aktiviert!"
+  
+  - platform: template
+    name: "WiFi Reconnect"
+    icon: mdi:wifi-refresh
+    entity_category: "diagnostic"
+    on_press:
+      - logger.log: "Manueller WiFi Reconnect angefordert"
+      - wifi.disable:
+      - delay: 2s
+      - wifi.enable:
+
+sprinkler:
+  - id: garden_sprinkler_ctrlr
+    name: "Garten Bewässerung"
+    
+    main_switch: 
+      name: "Bewässerung Hauptschalter"
+      icon: mdi:water
+    
+    auto_advance_switch: 
+      name: "Auto-Sequenz"
+      icon: mdi:play-circle
+      restore_mode: RESTORE_DEFAULT_ON
+    
+    reverse_switch: 
+      name: "Rückwärts-Modus"
+      icon: mdi:rotate-left
+      restore_mode: RESTORE_DEFAULT_OFF
+    
+    standby_switch:
+      name: "Standby Modus"
+      icon: mdi:pause-circle
+      restore_mode: RESTORE_DEFAULT_OFF
+    
+    multiplier_number:
+      name: "Dauer Multiplikator"
+      icon: mdi:multiplication
+      initial_value: 1.0
+      min_value: 0.1
+      max_value: 3.0
+      step: 0.1
+      restore_value: true
+    
+    repeat_number:
+      name: "Wiederholungen"
+      icon: mdi:repeat
+      initial_value: 1
+      min_value: 1
+      max_value: 5
+      step: 1
+      restore_value: true
+    
+    valve_overlap: 5s
+    pump_pulse_duration: 1s
+    valve_pulse_duration: 1s
+    
+    valves:
+      - valve_switch: 
+          name: "Zone 1 - Rasen vorne"
+          icon: mdi:sprinkler-variant
+        enable_switch: 
+          name: "Zone 1 aktiviert"
+          icon: mdi:toggle-switch
+          restore_mode: RESTORE_DEFAULT_ON
+        run_duration_number:
+          name: "Zone 1 Laufzeit"
+          id: garden_sprinkler_ctrlr_zone_1_laufzeit
+          icon: mdi:timer
+          initial_value: 300
+          min_value: 60
+          max_value: 3600
+          step: 30
+          unit_of_measurement: "s"
+          restore_value: true
+          mode: BOX
+        valve_switch_id: zone_1_relay
+      
+      - valve_switch: 
+          name: "Zone 2 - Rasen hinten"
+          icon: mdi:sprinkler-variant
+        enable_switch: 
+          name: "Zone 2 aktiviert"
+          icon: mdi:toggle-switch
+          restore_mode: RESTORE_DEFAULT_ON
+        run_duration_number:
+          name: "Zone 2 Laufzeit"
+          id: garden_sprinkler_ctrlr_zone_2_laufzeit
+          icon: mdi:timer
+          initial_value: 300
+          min_value: 60
+          max_value: 3600
+          step: 30
+          unit_of_measurement: "s"
+          restore_value: true
+          mode: BOX
+        valve_switch_id: zone_2_relay
+
+number:
+  - platform: template
+    name: "Maximale Laufzeit pro Zone"
+    icon: mdi:timer-alert
+    min_value: 10
+    max_value: 120
+    step: 5
+    initial_value: 60
+    unit_of_measurement: "min"
+    optimistic: true
+    restore_value: true
+    entity_category: "config"
+    mode: BOX
+
+script:
+  - id: test_sequence
+    mode: single
+    then:
+      - logger.log: "Starte Test-Sequenz"
+      - sprinkler.start_single_valve:
+          id: garden_sprinkler_ctrlr
+          valve_number: 0
+          run_duration: 10s
+      - delay: 15s
+      - sprinkler.start_single_valve:
+          id: garden_sprinkler_ctrlr
+          valve_number: 1
+          run_duration: 10s
+  
+  - id: update_last_watering_time
+    then:
+      - logger.log: "Letzte Bewässerung wurde gestartet"

@@ -1,0 +1,23 @@
+# ESPHome .gitignore - SICHERHEIT: secrets.yaml enthält WLAN-Passwort!
+
+# Build-Cache und temporäre Dateien (NICHT ins Git)
+/.esphome/
+*.tmp
+*.log
+
+# Kompilierte Binaries (NICHT ins Git)
+*.bin
+*.elf
+
+# Backup-Dateien (NICHT ins Git)  
+*.bak
+*~
+
+# ESPHome Build-Ordner
+build/
+
+# KRITISCH: secrets.yaml enthält WLAN-Passwort!
+secrets.yaml
+
+# Archive-Ordner kann ins Git (alte Configs ohne Secrets)
+# archive/ nur uncommentieren falls nicht gewünscht
