@@ -78,3 +78,318 @@ wohnzimmer_lichter_master:
           entity_id: switch.steckdose_5
 
 # === END BLOCK: SCRIPT_WOHNZIMMER_MASTER_BUTTON ===
+
+# === BLOCK: SCRIPT_KLIMA_ALLE_AUS ===
+# Zweck: Alle Klimaanlagen komplett ausschalten 
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: Alle climate Entitäten
+
+klima_alle_aus:
+  alias: "Klima Alle AUS"
+  description: "Schaltet alle Klimaanlagen aus"
+  sequence:
+    # Klimaanlagen ausschalten
+    - action: climate.turn_off
+      target:
+        entity_id:
+          - climate.buero
+          - climate.wohnzimmer
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+
+# === END BLOCK: SCRIPT_KLIMA_ALLE_AUS ===
+
+# === BLOCK: SCRIPT_KLIMA_NACHTMODUS ===
+# Zweck: Schlafräume auf 22°C + niedrigste Gebläse-Stufe + Oszillation aus + einschalten
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: climate.schlafzimmer, climate.finn, climate.nele, climate.jacob
+
+klima_nachtmodus:
+  alias: "Klima Nachtmodus"
+  description: "Setzt Schlafräume auf 22°C, leise, Oszillation aus, einschalten"
+  sequence:
+    # SCHRITT 1: Klimaanlagen einschalten - alle Schlafräume
+    - action: climate.turn_on
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # Kurz warten
+    - delay: 2
+    
+    # SCHRITT 2: HVAC-Modus explizit auf heat_cool setzen
+    - action: climate.set_hvac_mode
+      data:
+        hvac_mode: heat_cool
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # Wieder kurz warten
+    - delay: 1
+    
+    # Temperatur auf 22°C setzen - alle Schlafräume
+    - action: climate.set_temperature
+      data:
+        temperature: 22
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # TYP 1: Gebläse auf quiet (Jacob, Nele, Schlafzimmer)
+    - action: climate.set_fan_mode
+      data:
+        fan_mode: quiet
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.nele
+          - climate.jacob
+    
+    # TYP 2: Gebläse auf low (Finn) + Sleep Preset
+    - action: climate.set_fan_mode
+      data:
+        fan_mode: low
+      target:
+        entity_id:
+          - climate.finn
+    
+    - action: climate.set_preset_mode
+      data:
+        preset_mode: sleep
+      target:
+        entity_id:
+          - climate.finn
+    
+    # TYP 1: Oszillation stopped (Jacob, Nele, Schlafzimmer)
+    - action: climate.set_swing_mode
+      data:
+        swing_mode: stopped
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.nele
+          - climate.jacob
+    
+    # TYP 2: Oszillation off (Finn)
+    - action: climate.set_swing_mode
+      data:
+        swing_mode: 'off'
+      target:
+        entity_id:
+          - climate.finn
+    
+    # TYP 1: Horizontal auch stoppen (Jacob, Nele, Schlafzimmer)
+    - action: climate.set_swing_horizontal_mode
+      data:
+        swing_horizontal_mode: stopped
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.nele
+          - climate.jacob
+
+# === END BLOCK: SCRIPT_KLIMA_NACHTMODUS ===
+
+# === BLOCK: SCRIPT_KLIMA_KOMFORT_MODUS ===
+# Zweck: Alle Klimaanlagen auf 23°C + Gebläse auf auto + einschalten
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: Alle climate Entitäten
+
+klima_komfort_modus:
+  alias: "Klima Komfort-Modus"
+  description: "Setzt alle Klimaanlagen auf 23°C, Gebläse auto, einschalten"
+  sequence:
+    # SCHRITT 1: Klimaanlagen einschalten - alle
+    - action: climate.turn_on
+      target:
+        entity_id:
+          - climate.buero
+          - climate.wohnzimmer
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # Kurz warten
+    - delay: 2
+    
+    # SCHRITT 2: HVAC-Modus explizit auf heat_cool setzen
+    - action: climate.set_hvac_mode
+      data:
+        hvac_mode: heat_cool
+      target:
+        entity_id:
+          - climate.buero
+          - climate.wohnzimmer
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # Wieder kurz warten
+    - delay: 1
+    
+    # Temperatur auf 23°C setzen - alle Klimaanlagen
+    - action: climate.set_temperature
+      data:
+        temperature: 23
+      target:
+        entity_id:
+          - climate.buero
+          - climate.wohnzimmer
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # Gebläse auf auto - alle Klimaanlagen (beide Typen unterstützen auto)
+    - action: climate.set_fan_mode
+      data:
+        fan_mode: auto
+      target:
+        entity_id:
+          - climate.buero
+          - climate.wohnzimmer
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # TYP 2: Preset auf none zurücksetzen (Finn, Büro)
+    - action: climate.set_preset_mode
+      data:
+        preset_mode: none
+      target:
+        entity_id:
+          - climate.finn
+          - climate.buero
+
+# === END BLOCK: SCRIPT_KLIMA_KOMFORT_MODUS ===
+
+# === BLOCK: SCRIPT_KLIMA_SCHLAFBOOSTER ===
+# Zweck: Phase 1 des Schlafboosters - schnell auf 21°C kühlen + einschalten
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: climate.schlafzimmer, climate.finn, climate.nele, climate.jacob
+
+klima_schlafbooster:
+  alias: "Klima Schlafbooster"
+  description: "Phase 1: 21°C + high Gebläse + Oszillation an + einschalten"
+  sequence:
+    # Schlafbooster-Modus in Input Boolean aktivieren (für Automation)
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.schlafbooster_aktiv
+    
+    # SCHRITT 1: Klimaanlagen einschalten - alle Schlafräume
+    - action: climate.turn_on
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # Kurz warten
+    - delay: 2
+    
+    # SCHRITT 2: HVAC-Modus explizit auf heat_cool setzen
+    - action: climate.set_hvac_mode
+      data:
+        hvac_mode: heat_cool
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # Wieder kurz warten
+    - delay: 1
+    
+    # Temperatur auf 21°C setzen - alle Schlafräume
+    - action: climate.set_temperature
+      data:
+        temperature: 21
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # Gebläse auf high - alle Schlafräume (beide Typen unterstützen high)
+    - action: climate.set_fan_mode
+      data:
+        fan_mode: high
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.finn
+          - climate.nele
+          - climate.jacob
+    
+    # TYP 2: Preset auf none (kein sleep beim Booster) - Finn
+    - action: climate.set_preset_mode
+      data:
+        preset_mode: none
+      target:
+        entity_id:
+          - climate.finn
+    
+    # TYP 1: Oszillation rangefull (Jacob, Nele, Schlafzimmer)
+    - action: climate.set_swing_mode
+      data:
+        swing_mode: rangefull
+      target:
+        entity_id:
+          - climate.schlafzimmer
+          - climate.nele
+          - climate.jacob
+    
+    # TYP 2: Oszillation on (Finn)
+    - action: climate.set_swing_mode
+      data:
+        swing_mode: 'on'
+      target:
+        entity_id:
+          - climate.finn
+
+# === END BLOCK: SCRIPT_KLIMA_SCHLAFBOOSTER ===
+
+# === BLOCK: SCRIPT_KLIMA_SCHLAFBOOSTER_PHASE2 ===
+# Zweck: Phase 2 des Schlafboosters - automatisch in Schlafmodus wechseln
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: Wird von Automation aufgerufen
+
+klima_schlafbooster_phase2:
+  alias: "Klima Schlafbooster Phase 2"
+  description: "Phase 2: Automatisch auf 22°C + leise + nach oben"
+  sequence:
+    # Schlafbooster-Modus deaktivieren
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.schlafbooster_aktiv
+    
+    # In normalen Nachtmodus wechseln
+    - action: script.turn_on
+      target:
+        entity_id: script.klima_nachtmodus
+
+# === END BLOCK: SCRIPT_KLIMA_SCHLAFBOOSTER_PHASE2 ===

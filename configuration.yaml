@@ -9,3 +9,17 @@ frontend:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+
+# === BLOCK: INPUT_BOOLEAN_SCHLAFBOOSTER ===
+# Zweck: Helper für Schlafbooster Status-Tracking
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Zu configuration.yaml hinzufügen
+
+input_boolean:
+  schlafbooster_aktiv:
+    name: "Schlafbooster aktiv"
+    icon: mdi:weather-windy
+    initial: false
+    
+# === END BLOCK: INPUT_BOOLEAN_SCHLAFBOOSTER ===

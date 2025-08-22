@@ -186,3 +186,57 @@
           - switch.espsomfy
 
 # === END BLOCK: AUTOMATION_KRITISCHE_INFRASTRUKTUR ===
+
+# === BLOCK: AUTOMATION_SCHLAFBOOSTER_PHASE2_TRIGGER ===
+# Zweck: Automatischer Wechsel von Schlafbooster Phase 1 zu Phase 2
+# Status: 🔄 Neu
+# Erstellt: 2025-08-22
+# Abhängigkeiten: input_boolean.schlafbooster_aktiv, climate Entitäten
+
+- id: schlafbooster_phase2_trigger
+  alias: "Schlafbooster - Auto Wechsel zu Phase 2"
+  description: "Wechselt automatisch in leisen Modus wenn 21°C erreicht"
+  trigger:
+    # Überwacht alle Schlafraum-Temperaturen
+    - trigger: numeric_state
+      entity_id:
+        - climate.schlafzimmer
+        - climate.finn
+        - climate.nele
+        - climate.jacob
+      attribute: current_temperature
+      below: 21.5  # Etwas über 21°C um Schwankungen zu vermeiden
+  
+  condition:
+    # Nur ausführen wenn Schlafbooster aktiv ist
+    - condition: state
+      entity_id: input_boolean.schlafbooster_aktiv
+      state: 'on'
+    
+    # Und mindestens ein Raum die Zieltemperatur erreicht hat
+    - condition: template
+      value_template: >
+        {{ 
+          state_attr('climate.schlafzimmer', 'current_temperature') <= 21.5 or
+          state_attr('climate.finn', 'current_temperature') <= 21.5 or
+          state_attr('climate.nele', 'current_temperature') <= 21.5 or
+          state_attr('climate.jacob', 'current_temperature') <= 21.5
+        }}
+  
+  action:
+    # Kurz warten um sicherzugehen dass Temperatur stabil ist
+    - delay: 30
+    
+    # In Phase 2 wechseln
+    - action: script.turn_on
+      target:
+        entity_id: script.klima_schlafbooster_phase2
+    
+    # Benachrichtigung senden (optional)
+    - action: persistent_notification.create
+      data:
+        title: "Schlafbooster"
+        message: "Zieltemperatur erreicht - wechsle in leisen Nachtmodus"
+        notification_id: schlafbooster_phase2
+
+# === END BLOCK: AUTOMATION_SCHLAFBOOSTER_PHASE2_TRIGGER ===
