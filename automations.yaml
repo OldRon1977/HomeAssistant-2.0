@@ -8,7 +8,7 @@
   alias: "Licht - Sonnenuntergang alle an"
   description: "Schaltet alle Lichter bei Sonnenuntergang mit 0.5s Verzögerung ein"
   trigger:
-    - platform: sun
+    - trigger: sun
       event: sunset
   action:
     - action: switch.turn_on
@@ -41,7 +41,7 @@
   alias: "Licht - Nachtabschaltung 23:00"
   description: "Schaltet Wohnzimmerlichter um 23:00 mit 0.5s Verzögerung aus"
   trigger:
-    - platform: time
+    - trigger: time
       at: "23:00:00"
   action:
     - action: switch.turn_off
@@ -71,7 +71,7 @@
   alias: "Licht - Sonnenaufgang Außenlampe aus"
   description: "Schaltet Außenlampe bei Sonnenaufgang aus"
   trigger:
-    - platform: sun
+    - trigger: sun
       event: sunrise
   action:
     - action: switch.turn_off
@@ -89,12 +89,11 @@
   alias: "Licht - Winter 07:00 Wohnzimmer an"
   description: "Schaltet Wohnzimmerlichter um 07:00 ein, nur wenn Sonnenaufgang nach 07:00"
   trigger:
-    - platform: time
+    - trigger: time
       at: "07:00:00"
   condition:
     - condition: template
-      value_template: >
-        {{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}
+      value_template: "{{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}"
   action:
     - action: switch.turn_on
       entity_id: switch.steckdose_1
@@ -123,12 +122,11 @@
   alias: "Licht - Winter 08:00 Wohnzimmer aus"
   description: "Schaltet Wohnzimmerlichter um 08:00 aus, nur wenn Sonnenaufgang nach 07:00"
   trigger:
-    - platform: time
+    - trigger: time
       at: "08:00:00"
   condition:
     - condition: template
-      value_template: >
-        {{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}
+      value_template: "{{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}"
   action:
     - action: switch.turn_off
       entity_id: switch.steckdose_1
