@@ -1,0 +1,464 @@
+title: Maintenance
+path: maintenance
+icon: mdi:shield-check
+cards:
+  - type: vertical-stack
+    title: Kühlgeräte
+    cards:
+      - type: grid
+        columns: 4
+        square: false
+        cards:
+          - type: custom:button-card
+            entity: switch.kuhlschrank
+            name: Kühlschrank
+            icon: mdi:fridge
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:fridge-alert
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:fridge-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:fridge
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+          - type: custom:button-card
+            entity: switch.kuhlschrank_keller
+            name: Kühlschrank Keller
+            icon: mdi:fridge
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:fridge-alert
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:fridge-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:fridge
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+          - type: custom:button-card
+            entity: switch.froster_kuche
+            name: Froster Küche
+            icon: mdi:snowflake
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:snowflake-alert
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:snowflake-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:snowflake
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+  - type: vertical-stack
+    title: Wohnen & Heizung
+    cards:
+      - type: grid
+        columns: 4
+        square: false
+        cards:
+          - type: custom:button-card
+            entity: switch.steckdose_31_heizung
+            name: Heizung
+            icon: mdi:radiator
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:radiator-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:radiator-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:radiator
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+          - type: custom:button-card
+            entity: switch.steckdose_23_wasserenthaerter
+            name: Wasserenthärter
+            icon: mdi:water-pump
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:water-pump-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:water-pump-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:water-pump
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+          - type: custom:button-card
+            entity: switch.steckdose_26_franke_heisswasser
+            name: Heißwasser
+            icon: mdi:water-boiler
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:water-boiler-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:water-boiler-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:water-boiler
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+          - type: custom:button-card
+            entity: switch.steckdose_27_franke_chiller
+            name: Kaltwasser
+            icon: mdi:cup-water
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:cup-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:cup-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:cup-water
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+  - type: vertical-stack
+    title: Haushaltsgeräte
+    cards:
+      - type: grid
+        columns: 4
+        square: false
+        cards:
+          - type: custom:button-card
+            entity: switch.steckdose_21_waschmaschine
+            name: Waschmaschine
+            icon: mdi:washing-machine
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:washing-machine-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:washing-machine-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:washing-machine
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+          - type: custom:button-card
+            entity: switch.steckdose_22_trockner
+            name: Trockner
+            icon: mdi:tumble-dryer
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:tumble-dryer-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:tumble-dryer-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:tumble-dryer
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+          - type: custom:button-card
+            entity: switch.steckdose_30_spuelmaschine
+            name: Spülmaschine
+            icon: mdi:dishwasher
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:dishwasher-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:dishwasher-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:dishwasher
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+  - type: vertical-stack
+    title: Technik-Infrastruktur
+    cards:
+      - type: grid
+        columns: 4
+        square: false
+        cards:
+          - type: custom:button-card
+            entity: switch.steckdose_34_tp_link_switch
+            name: TP-Link Switch
+            icon: mdi:switch
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:network-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:network-off
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:switch
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
+          - type: custom:button-card
+            entity: switch.espsomfy
+            name: ESPSomfy
+            icon: mdi:window-shutter
+            tap_action:
+              action: none
+            styles:
+              card:
+                - height: 50px
+                - border-radius: 8px
+                - font-size: 12px
+              icon:
+                - width: 24px
+                - height: 24px
+            state:
+              - value: unavailable
+                color: "#757575"
+                icon: mdi:window-shutter-alert
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - value: "off"
+                color: "#757575"
+                icon: mdi:window-shutter-alert
+                styles:
+                  card:
+                    - background-color: "#E57373"
+                    - color: white
+              - operator: default
+                color: white
+                icon: mdi:window-shutter
+                styles:
+                  card:
+                    - background-color: "#689F38"
+                    - color: white
