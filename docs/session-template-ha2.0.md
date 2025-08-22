@@ -2,7 +2,7 @@
 
 **Datum der letzten Session:** 2025-08-22  
 **Repository:** https://github.com/OldRon1977/HomeAssistant-2.0  
-**Letzter Commit:** Feature: Kritische Infrastruktur Dashboard mit einheitlichem Design
+**Letzter Commit:** Feature: TV-Button zu Beleuchtung View hinzugefügt
 
 ## Implementierte Features
 
@@ -32,12 +32,14 @@
 
 ### Dashboard-UI System (Status: ✅ Vollständig implementiert)
 
-#### Beleuchtung Dashboard (Status: ✅ Implementiert, bereit für Aktivierung)
-**docs/dashboards/dashboard-main.yaml erstellt:**
-- **Wohnzimmer-Sektion:** 5 Einzellampen + Master-Button (3x2 Grid)
+#### Beleuchtung Dashboard (Status: ✅ Erweitert mit TV-Steuerung)
+**docs/dashboards/dashboard-main-beleuchtung.yaml (View):**
+- **Wohnzimmer-Sektion:** 5 Einzellampen + Master-Button + TV-Button (3x3 Grid)
+- **TV-Integration:** `switch.fernseher` mit `mdi:television` Icon
 - **Außenbereich-Sektion:** Außenlampe Tür (erweiterbar)
 - **Live-Updates:** Master-Button reagiert sofort auf Lampen-Änderungen
-- **Clean Design:** button-card mit einheitlichen Icons (mdi:lightbulb)
+- **Clean Design:** button-card mit einheitlichen Icons und Farbschema
+- **Grid-Layout:** 7 Buttons in 3 Spalten x 3 Reihen optimal angeordnet
 
 #### Kritische Infrastruktur Dashboard (Status: ✅ Produktiv implementiert)
 **docs/dashboards/dashboard-main-maintenance.yaml erstellt:**
@@ -62,7 +64,9 @@
 - **Dashboard Design:** Einheitliches button-card Muster über alle 12 Geräte
 - **Farbschema:** Grün/Rot Kombination korrekt implementiert
 - **Datei-Struktur:** Hierarchisches dashboard-main-[SEKTION].yaml Schema
-- **Git-Workflow:** Einzelbefehle bevorzugt (bestätigt)
+- **View-System:** Einzelne Views für modulare Dashboard-Entwicklung
+- **TV-Integration:** Entertainment-Button in Beleuchtung View erfolgreich
+- **Grid-Layout:** 3x3 Layout für 7 Buttons optimal
 
 ### Ausstehende Tests (nächste Session):
 - **Dashboard aktivieren:** Lovelace-Modus in configuration.yaml
@@ -92,19 +96,21 @@ lovelace:
       title: "Kritische Infrastruktur"
 ```
 
-### Dashboard-Struktur (Hierarchisches System):
+### Dashboard-Struktur (Hierarchisches System + Views):
 ```
 docs/dashboards/
-├── dashboard-main.yaml              # Hauptdashboard (Beleuchtung) ✅
+├── dashboard-main.yaml              # Hauptdashboard (Multi-View) ✅
+├── dashboard-main-beleuchtung.yaml  # Beleuchtung View (mit TV) ✅
 ├── dashboard-main-maintenance.yaml  # Kritische Infrastruktur ✅
 ├── dashboard-main-heizung.yaml      # Zukünftig: Heizung-Sektion
 ├── dashboard-main-sicherheit.yaml   # Zukünftig: Sicherheit-Sektion
 └── dashboard-main-energie.yaml      # Zukünftig: Energie-Sektion
 
-Beleuchtung (dashboard-main.yaml)
+Beleuchtung View (dashboard-main-beleuchtung.yaml)
 ├── Wohnzimmer (Card)
-│   ├── Lampe 1-5 (Einzelbuttons)
-│   └── Alle Lampen (Master-Button)
+│   ├── Lampe 1-5 (Einzelbuttons) - Reihe 1+2
+│   ├── Alle Lampen (Master-Button) - Reihe 2
+│   └── TV (Entertainment) - Reihe 3 ✅
 └── Außenbereich (Card)
     └── Außenlampe Tür
 
@@ -116,7 +122,8 @@ Kritische Infrastruktur (dashboard-main-maintenance.yaml)
 ```
 
 ### Entitäten-Mapping:
-- Wohnzimmer: `switch.steckdose_1` bis `switch.steckdose_5`
+- Wohnzimmer Beleuchtung: `switch.steckdose_1` bis `switch.steckdose_5`
+- Wohnzimmer Entertainment: `switch.fernseher`
 - Außen: `switch.licht_haustur_licht_haustur`
 - Script: `script.wohnzimmer_lichter_master`
 - Kritisch: 12 Switches in Automation + Dashboard erfasst
@@ -267,15 +274,15 @@ git push
 │   ├── README.md                  # Projekt-Dokumentation
 │   ├── session-template-ha2.0.md  # Session-Übergabe (DIESE DATEI)
 │   └── dashboards/
-│       ├── dashboard-main.yaml             # Beleuchtung ✅
-│       └── dashboard-main-maintenance.yaml # Kritische Infrastruktur ✅
+│       ├── dashboard-main-beleuchtung.yaml    # Beleuchtung + TV ✅
+│       └── dashboard-main-maintenance.yaml    # Kritische Infrastruktur ✅
 └── .gitignore                     # Korrekt konfiguriert
 ```
 
 **Letzter erfolgreicher Commit:**
-- Titel: "Feature: Kritische Infrastruktur Dashboard mit einheitlichem Design"
-- Status: Design validiert, bereit für Aktivierung
-- Neue Datei: dashboard-main-maintenance.yaml
+- Titel: "Feature: TV-Button zu Beleuchtung View hinzugefügt"
+- Status: View optimiert, bereit für Aktivierung
+- Neue Funktionalität: Entertainment-Integration
 
 ## Erfolgs-Kennzahlen Session 2025-08-22
 
@@ -284,10 +291,13 @@ git push
 ✅ **Design-System:** Einheitliches button-card Muster etabliert  
 ✅ **Farbschema:** Grün/Rot Status-Anzeige implementiert  
 ✅ **Datei-Struktur:** Hierarchisches dashboard-main-[SEKTION].yaml Schema  
+✅ **View-System:** Modulare Dashboard-Entwicklung mit einzelnen Views  
+✅ **TV-Integration:** Entertainment-Button zu Beleuchtung hinzugefügt  
+✅ **Grid-Optimierung:** 3x3 Layout für bessere Übersichtlichkeit  
 ✅ **Git-Workflow:** Einzelbefehl-Präferenz dokumentiert und angewendet  
 ✅ **Status-Monitoring:** Alle kritischen Geräte überwachbar  
 
-**Hierarchisches Dashboard-System etabliert:** Wartung + Beleuchtung getrennt organisiert! 🏗️
+**Dashboard-System komplett:** Wartung + Beleuchtung + Entertainment integriert! 🏗️📺
 
 ---
 
@@ -296,9 +306,12 @@ git push
 - [x] Einheitliches Design für alle 12 Geräte implementiert
 - [x] 4 Kategorien sinnvoll strukturiert (Kühlung, Wohnen, Haushalt, Technik)
 - [x] Hierarchisches Datei-System etabliert (dashboard-main-[SEKTION].yaml)
+- [x] View-System für modulare Dashboard-Entwicklung implementiert
+- [x] TV-Button zu Beleuchtung View hinzugefügt (switch.fernseher)
+- [x] Grid-Layout auf 3x3 für 7 Buttons optimiert
 - [x] Git-Workflow mit Einzelbefehlen dokumentiert
 - [x] Session-Template aktualisiert
 - [x] Technische Erkenntnisse erfasst
 - [x] Nächste Schritte priorisiert
 
-**Für nächste Session:** Multi-Dashboard Aktivierung + UI-Tests + Navigation! 🚀
+**Für nächste Session:** Multi-Dashboard Aktivierung + UI-Tests + Navigation + Entertainment-Erweiterung! 🚀📺
