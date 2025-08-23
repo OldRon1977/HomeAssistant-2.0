@@ -422,3 +422,21 @@ klima_schlafbooster_phase2:
         entity_id: script.klima_nachtmodus
 
 # === END BLOCK: SCRIPT_KLIMA_SCHLAFBOOSTER_PHASE2 ===
+
+# === BLOCK: SCRIPT_DACHLUKE_DUSCHMODUS ===
+# Zweck: Duschmodus - Dachluke auf 70% öffnen und Timer starten
+# Status: 🔄 Neu
+# Erstellt: 2025-08-23
+# Abhängigkeiten: cover.strom_dachluke_unten_dachluke_bad_unten
+# Logik: Immer auf 70% öffnen → Timer startet automatisch durch Automation
+
+dachluke_duschmodus:
+  alias: "Dachluke Duschmodus"
+  description: "Öffnet Dachluke auf 70% für optimale Belüftung beim Duschen"
+  sequence:
+    - action: cover.set_cover_position
+      entity_id: cover.strom_dachluke_unten_dachluke_bad_unten
+      data:
+        position: 70
+
+# === END BLOCK: SCRIPT_DACHLUKE_DUSCHMODUS ===

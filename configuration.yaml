@@ -23,3 +23,27 @@ input_boolean:
     initial: false
     
 # === END BLOCK: INPUT_BOOLEAN_SCHLAFBOOSTER ===
+
+# === BLOCK: TIMER_DACHLUKE_AUTO_CLOSE ===
+# Zweck: Timer für automatisches Schließen der Dachluke nach variabler Zeit
+# Status: 🔄 Bereinigt
+# Erstellt: 2025-08-23
+# Abhängigkeiten: cover.strom_dachluke_unten_dachluke_bad_unten, input_number.dachluke_timer_minuten
+
+timer:
+  dachluke_auto_close:
+    duration: "00:20:00"
+    name: "Dachluke Auto-Close Timer"
+    icon: mdi:timer-outline
+
+input_number:
+  dachluke_timer_minuten:
+    name: "Dachluke Timer Minuten"
+    min: 1
+    max: 60
+    step: 1
+    initial: 20
+    unit_of_measurement: "min"
+    icon: mdi:timer-cog
+
+# === END BLOCK: TIMER_DACHLUKE_AUTO_CLOSE ===

@@ -284,3 +284,53 @@
         notification_id: schlafbooster_phase2
 
 # === END BLOCK: AUTOMATION_SCHLAFBOOSTER_PHASE2_TRIGGER ===
+
+# === BLOCK: AUTOMATION_DACHLUKE_TIMER_RESTART ===
+# Zweck: Timer bei jeder Dachluke-Positionsänderung neu starten mit variabler Dauer
+# Status: 🔧 Template korrigiert
+# Erstellt: 2025-08-23
+# Abhängigkeiten: cover.strom_dachluke_unten_dachluke_bad_unten, timer.dachluke_auto_close, input_number.dachluke_timer_minuten
+
+- id: dachluke_timer_restart
+  alias: "Dachluke - Timer bei Positionsänderung starten"
+  description: "Startet Timer bei jeder Dachluke-Bewegung mit einstellbarer Dauer"
+  trigger:
+    - trigger: state
+      entity_id: cover.strom_dachluke_unten_dachluke_bad_unten
+      attribute: current_position
+  action:
+    - action: timer.cancel
+      entity_id: timer.dachluke_auto_close
+    - action: timer.start
+      entity_id: timer.dachluke_auto_close
+      data:
+        duration: >
+          {% set minutes = states('input_number.dachluke_timer_minuten') | int %}
+          {{ '%02d:%02d:00' | format(0, minutes) }}
+
+# === END BLOCK: AUTOMATION_DACHLUKE_TIMER_RESTART ===
+
+# === BLOCK: AUTOMATION_DACHLUKE_AUTO_CLOSE ===
+# Zweck: Dachluke automatisch schließen nach Timer-Ablauf
+# Status: ✅ Getestet
+# Erstellt: 2025-08-23
+# Abhängigkeiten: timer.dachluke_auto_close, cover.strom_dachluke_unten_dachluke_bad_unten
+
+- id: dachluke_auto_close
+  alias: "Dachluke - Automatisch schließen nach Timer"
+  description: "Schließt Dachluke auf 0% nach Timer-Ablauf"
+  trigger:
+    - trigger: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.dachluke_auto_close
+  condition:
+    - condition: template
+      value_template: "{{ state_attr('cover.strom_dachluke_unten_dachluke_bad_unten', 'current_position') | int > 0 }}"
+  action:
+    - action: cover.set_cover_position
+      entity_id: cover.strom_dachluke_unten_dachluke_bad_unten
+      data:
+        position: 0
+
+# === END BLOCK: AUTOMATION_DACHLUKE_AUTO_CLOSE ===
