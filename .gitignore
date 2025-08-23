@@ -1,69 +1,66 @@
-# === HOME ASSISTANT CORE ===
-# Logs und Datenbanken
+# Home Assistant spezifische Dateien
 *.log
-*.log.*
 *.db
 *.db-shm
 *.db-wal
 home-assistant.log*
+*.log.*
 *.fault
-
-# System-Dateien
-.HA_VERSION
 .uuid
+.HA_VERSION
 .cloud/
 .storage/
 blueprints/
 deps/
 tts/
-www/downloads/  # Falls Downloads im www Ordner
-
-# === SENSIBLE DATEN ===
+www/
+.google.token
 secrets.yaml
 known_devices.yaml
-.google.token
+.ios.conf
 .spotify-token-cache
 .homekit.state
-.ios.conf
-ip_bans.yaml
 
-# === ZIGBEE2MQTT ===
-zigbee2mqtt/state.json
-zigbee2mqtt/*.json.bak
-zigbee2mqtt/log/
-zigbee2mqtt/coordinator_backup.json  # Neu hinzugefügt!
-
-# === ESPHOME ===
-esphome/.esphome/
-esphome/secrets.yaml  # WICHTIG - fehlt noch bei dir!
-esphome/*.bin
-esphome/*.elf
-
-# === BACKUPS ===
+# Backups
 backups/
 backup/
 *.backup
 
-# === TEMPORARY FILES ===
+# Temporary files
 *.tmp
 *.bak
 *~
 .DS_Store
 Thumbs.db
 
-# === IDE/EDITOR ===
+# IDE/Editor files
 .vscode/settings.json
 .idea/
 
-# === CUSTOM COMPONENTS & ADD-ONS ===
-custom_components/  # Optional
+# Custom components - über HACS verwaltet
+custom_components/
+
+# Add-on configs
 addons/
 
-# === HACS ===
+# HACS
 hacs/
-www/community/  # HACS installiert hier Frontend-Komponenten
 
-# === NODE/PYTHON ===
+# Node modules
 node_modules/
+
+# Python Cache
 __pycache__/
-*.pyccustom_components/
+*.pyc
+
+# Zigbee2MQTT
+zigbee2mqtt/coordinator_backup.json
+zigbee2mqtt/state.json
+zigbee2mqtt/*.json.bak
+zigbee2mqtt/log/
+
+# ESPHome
+esphome/.esphome/
+esphome/secrets.yaml
+esphome/*.bin
+esphome/*.elf
