@@ -1,9 +1,11 @@
 # === BLOCK: SCRIPT_WOHNZIMMER_MASTER_BUTTON ===
 # Zweck: Master-Button für Wohnzimmerlichter mit intelligenter Schaltlogik
-# Status: 🔄 Neu
+# Status: ✅ Getestet - DELAYS ERFORDERLICH!
 # Erstellt: 2025-08-22
+# Geändert: 2025-08-23 - HA 2024.10+ Syntax beachtet
 # Abhängigkeiten: switch.steckdose_1-5
 # Logik: Alle aus→alle an, alle an→alle aus, gemischt→alle aus
+# WICHTIG: 0.5s Delay zwischen Schaltungen wegen Stromspitzen!
 
 wohnzimmer_lichter_master:
   alias: "Wohnzimmer Lichter Master"
@@ -21,19 +23,28 @@ wohnzimmer_lichter_master:
                    is_state('switch.steckdose_5', 'off') }}
           sequence:
             - action: switch.turn_on
-              entity_id: switch.steckdose_1
-            - delay: 0.5
+              target:
+                entity_id: switch.steckdose_1
+            - delay: 
+                milliseconds: 500
             - action: switch.turn_on
-              entity_id: switch.steckdose_2
-            - delay: 0.5
+              target:
+                entity_id: switch.steckdose_2
+            - delay: 
+                milliseconds: 500
             - action: switch.turn_on
-              entity_id: switch.steckdose_3
-            - delay: 0.5
+              target:
+                entity_id: switch.steckdose_3
+            - delay: 
+                milliseconds: 500
             - action: switch.turn_on
-              entity_id: switch.steckdose_4
-            - delay: 0.5
+              target:
+                entity_id: switch.steckdose_4
+            - delay: 
+                milliseconds: 500
             - action: switch.turn_on
-              entity_id: switch.steckdose_5
+              target:
+                entity_id: switch.steckdose_5
         
         # CASE 2: Alle Lichter sind AN → Alle ausschalten
         - conditions:
@@ -46,36 +57,54 @@ wohnzimmer_lichter_master:
                    is_state('switch.steckdose_5', 'on') }}
           sequence:
             - action: switch.turn_off
-              entity_id: switch.steckdose_1
-            - delay: 0.5
+              target:
+                entity_id: switch.steckdose_1
+            - delay: 
+                milliseconds: 500
             - action: switch.turn_off
-              entity_id: switch.steckdose_2
-            - delay: 0.5
+              target:
+                entity_id: switch.steckdose_2
+            - delay: 
+                milliseconds: 500
             - action: switch.turn_off
-              entity_id: switch.steckdose_3
-            - delay: 0.5
+              target:
+                entity_id: switch.steckdose_3
+            - delay: 
+                milliseconds: 500
             - action: switch.turn_off
-              entity_id: switch.steckdose_4
-            - delay: 0.5
+              target:
+                entity_id: switch.steckdose_4
+            - delay: 
+                milliseconds: 500
             - action: switch.turn_off
-              entity_id: switch.steckdose_5
+              target:
+                entity_id: switch.steckdose_5
 
       # DEFAULT CASE: Gemischte Zustände → Alle ausschalten
       default:
         - action: switch.turn_off
-          entity_id: switch.steckdose_1
-        - delay: 0.5
+          target:
+            entity_id: switch.steckdose_1
+        - delay: 
+            milliseconds: 500
         - action: switch.turn_off
-          entity_id: switch.steckdose_2
-        - delay: 0.5
+          target:
+            entity_id: switch.steckdose_2
+        - delay: 
+            milliseconds: 500
         - action: switch.turn_off
-          entity_id: switch.steckdose_3
-        - delay: 0.5
+          target:
+            entity_id: switch.steckdose_3
+        - delay: 
+            milliseconds: 500
         - action: switch.turn_off
-          entity_id: switch.steckdose_4
-        - delay: 0.5
+          target:
+            entity_id: switch.steckdose_4
+        - delay: 
+            milliseconds: 500
         - action: switch.turn_off
-          entity_id: switch.steckdose_5
+          target:
+            entity_id: switch.steckdose_5
 
 # === END BLOCK: SCRIPT_WOHNZIMMER_MASTER_BUTTON ===
 

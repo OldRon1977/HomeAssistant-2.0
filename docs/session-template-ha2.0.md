@@ -1,291 +1,221 @@
 Home Assistant 2.0 - Projektstand für nächste Session
-Datum der letzten Session: 2025-08-22
+Datum der letzten Session: 2025-08-23
 Repository: https://github.com/OldRon1977/HomeAssistant-2.0
-Letzter Commit: Feature: Vollständiges Klima-Steuerungssystem implementiert
-Implementierte Features
-Klima-Dashboard (Status: ✅ Produktiv)
+Letzter Commit: CRITICAL: Delays wieder eingebaut - Stromspitzen vermeiden (Sicherung!)
+🚨 KRITISCHE SICHERHEITSHINWEISE
+⚡ STROMSPITZEN-PROBLEM - NIEMALS IGNORIEREN!
+ALLE Lampen-Schaltungen MÜSSEN 0.5s Delays haben!
+
+5 Lampen gleichzeitig = Sicherung fliegt raus
+IMMER einzeln schalten mit delay: milliseconds: 500
+Betrifft: ALLE Automationen und Scripts mit mehreren Lampen
+GETESTET: Ohne Delays löst die Sicherung aus!
+
+🔐 ESPHome Sicherheitslücke (NOCH OFFEN!)
+esphome/bewcmp.yaml enthält WLAN-Passwort im Klartext!
+yaml# SOFORT KORRIGIEREN:
+wifi:
+  ssid: !secret wifi_ssid  # Nicht "Messer" im Klartext!
+  password: !secret wifi_password  # Nicht Passwort im Klartext!
+esphome/secrets.yaml erstellen und in .gitignore aufnehmen!
+Implementierte Features (Stand: 23.08.2025)
+Lichtsteuerung (Status: ✅ Produktiv mit Delays)
+Automationen auf HA 2024.10+ Syntax migriert und getestet:
+
+automation.licht_sonnenuntergang - MIT 0.5s Delays zwischen Lampen
+automation.licht_nachtabschaltung - MIT 0.5s Delays
+automation.licht_sonnenaufgang - Einzelne Lampe (kein Delay nötig)
+automation.licht_winter_morgen_an - MIT 0.5s Delays - GETESTET via skip_condition
+automation.licht_winter_morgen_aus - MIT 0.5s Delays
+
+Script mit Delays:
+
+script.wohnzimmer_lichter_master - Intelligenter Master-Button MIT Delays
+
+Syntax-Updates durchgeführt:
+
+triggers: statt trigger: ✅
+actions: statt action: ✅
+conditions: statt condition: ✅
+YAML Anchors entfernt (nicht offiziell unterstützt) ✅
+
+Dashboard-UI (Status: ✅ Erstellt, noch nicht verlinkt)
+docs/dashboards/dashboard-main.yaml:
+
+Wohnzimmer-Sektion: 5 Einzellampen + Master-Button (3x2 Grid)
+Außenbereich-Sektion: Außenlampe Tür
+5-Farben-Schema: grau-blau, gelb, blau, rot, grün
+Live-Updates: Master-Button reagiert auf Lampen-Änderungen
+button-card Konfiguration mit triggers_update
+
+Klima-Dashboard (Status: ✅ Erstellt aus vorheriger Session)
 docs/dashboards/dashboard-main-klima.yaml:
 
-Hierarchisches Layout: System Übersicht + Schnell-Aktionen + Thermostate
-Status-Übersicht: Live-Anzeige aktiver AirCos, Außentemperatur, Ø Innentemperatur
-4 Schnell-Aktionen: Alle AUS, Nachtmodus, Komfort-Modus, Schlafbooster
-6 Thermostate: better-thermostat-ui-card für alle Klimaanlagen
-Responsive Design: max_columns: 2, column_span optimiert
-Clean Code: Keine grid_options, keine Icons in Namen
+System-Übersicht mit Live-Countern
+4 Schnell-Aktionen: Alle AUS, Nachtmodus, Komfort, Schlafbooster
+6 Thermostate für Klimaanlagen
+Scripts für Klima-Modi funktional
 
-Klima-Scripts (Status: ✅ Produktiv)
-scripts.yaml - 5 Scripts implementiert:
-1. klima_alle_aus:
+Technische Erkenntnisse Session 23.08.2025
+🔴 KRITISCH - Delays sind PFLICHT!
+yaml# FALSCH - Sicherung fliegt:
+- action: switch.turn_on
+  target:
+    entity_id: 
+      - switch.steckdose_1
+      - switch.steckdose_2
 
-HVAC-Modus: climate.turn_off
-Betrifft: Alle 6 Klimaanlagen
+# RICHTIG - Mit Delays:
+- action: switch.turn_on
+  target:
+    entity_id: switch.steckdose_1
+- delay: 
+    milliseconds: 500
+- action: switch.turn_on
+  target:
+    entity_id: switch.steckdose_2
+📝 Reload-Befehle NUR über UI!
+bash# FUNKTIONIERT NICHT ZUVERLÄSSIG:
+ha automation reload  # ❌ Kommando existiert nicht
+ha service call automation.reload  # ❌ Funktioniert oft nicht
 
-2. klima_nachtmodus:
+# EINZIG ZUVERLÄSSIG:
+# Entwicklerwerkzeuge → YAML → AUTOMATIONEN Button
+✅ Funktionierende CLI-Befehle:
+bashha core check  # Config prüfen ✅
+ha core restart  # Neustart ✅
+🧪 Automation-Test-Methode:
+yaml# Entwicklerwerkzeuge → Aktionen:
+service: automation.trigger
+target:
+  entity_id: automation.licht_winter_07_00_wohnzimmer_an
+data:
+  skip_condition: true  # Ignoriert Bedingungen für Test
+📋 Projekt-Workflow bestätigt:
 
-Ziel: 22°C + leise + Oszillation aus
-Betrifft: Schlafräume (Schlafzimmer, Finn, Nele, Jacob)
-Typ 1 (Jacob, Nele, Schlafzimmer): fan_mode: quiet, swing: stopped
-Typ 2 (Finn): fan_mode: low + preset: sleep, swing: off
+IMMER vollständige Dateien oder vollständige Blöcke liefern
+Block-System strikt einhalten: === BLOCK: NAME === und === END BLOCK: NAME ===
+Status im Block-Header dokumentieren (✅ Getestet / 🔄 Neu / ⚠️ Experimentell)
+Abhängigkeiten und kritische Hinweise (wie Delays) dokumentieren
 
-3. klima_komfort_modus:
+System-Übersicht
+Verfügbare Hardware:
+Beleuchtung:
 
-Ziel: 23°C + fan_mode: auto
-Betrifft: Alle 6 Klimaanlagen
-Typ 2 Preset-Reset: none
+5 Wohnzimmer-Steckdosen (switch.steckdose_1-5) - AKTIV mit Delays
+1 Außenlampe (switch.licht_haustur_licht_haustur) - AKTIV
+10 weitere Zigbee-Steckdosen - NOCH NICHT EINGEBUNDEN
 
-4. klima_schlafbooster:
+Klimaanlagen (aus vorheriger Session):
 
-Phase 1: 21°C + fan_mode: high + Oszillation an
-Typ 1 Swing: rangefull, Typ 2 Swing: on
-Aktiviert input_boolean.schlafbooster_aktiv
+6 Klimaanlagen über Zigbee/MQTT
+2 verschiedene Hardware-Typen identifiziert
 
-5. klima_schlafbooster_phase2:
+ESPHome:
 
-Automatischer Wechsel zu klima_nachtmodus
-Deaktiviert input_boolean.schlafbooster_aktiv
+1 Bewässerungscomputer (bewcmp) - SICHERHEITSLÜCKE!
 
-Automation (Status: ✅ Produktiv)
-automations.yaml - Schlafbooster-Auto-Wechsel:
+Datei-Struktur:
+/config/
+├── configuration.yaml          # Hauptkonfiguration
+├── automations.yaml           # 5 Licht-Automationen (HA 2024.10+ Syntax)
+├── scripts.yaml              # Wohnzimmer-Master + Klima-Scripts
+├── scenes.yaml               # Leer
+├── docs/
+│   ├── dashboards/
+│   │   ├── dashboard-main.yaml       # Beleuchtung
+│   │   └── dashboard-main-klima.yaml # Klima-System
+│   └── session-template-ha2.0.md     # Diese Dokumentation
+└── esphome/
+    └── bewcmp.yaml           # ⚠️ WLAN-Passwort im Klartext!
+Offene Punkte - PRIORITÄT
+🔴 KRITISCH (Sicherheit):
 
-Trigger: Temperatur ≤ 21.5°C in Schlafräumen
-Condition: input_boolean.schlafbooster_aktiv = on
-Action: Automatisch Phase 2 (leiser Modus)
-Benachrichtigung: Persistent notification
+ESPHome secrets.yaml erstellen - WLAN-Passwort aus bewcmp.yaml entfernen!
+bashecho 'wifi_ssid: "Messer"' > esphome/secrets.yaml
+echo 'wifi_password: "PASSWORT_HIER"' >> esphome/secrets.yaml
+echo "secrets.yaml" >> esphome/.gitignore
 
-Helper (Status: ✅ Produktiv)
-configuration.yaml:
 
-input_boolean.schlafbooster_aktiv für Status-Tracking
+🟡 HOCH (Funktionalität):
 
-Getestete Funktionen
-Session 2025-08-22 - Erfolgreich validiert:
+Weitere Steckdosen einbinden - 10 ungenutzte Zigbee-Steckdosen
+Groups erstellen für logische Raumzuordnung
 
-2-Schritt-Logik: climate.turn_on → delay → climate.set_hvac_mode funktioniert
-Typ-spezifische Modi: Unterschiedliche Klimaanlagen-Typen korrekt unterstützt
-Dashboard-UI: Alle 4 Buttons funktional
-YAML-Syntax: ha core check erfolgreich
-Temperatur-Steuerung: Korrekte Werte werden gesetzt
-Fan-Modi: Typ-spezifische Gebläse-Einstellungen funktionieren
-Oszillation: Swing-Modi je Klimaanlage korrekt
+🟢 MITTEL (Nice-to-have):
 
-Debugging-Erkenntnisse:
+Bewässerungscomputer ins Dashboard integrieren
+Energie-Monitoring für Waschmaschine/Trockner
+Zeitgesteuerte Automationen erweitern
 
-Problem: climate.set_hvac_mode allein funktioniert nicht
-Lösung: 2-Schritt-Logik: turn_on → delay: 2 → set_hvac_mode → delay: 1
-Timing: Delays zwischen Aktionen notwendig
-Typ-Unterschiede: Zwei verschiedene Klimaanlagen-Hardware erkannt und unterstützt
-
-System-Konfiguration
-Klimaanlagen-Typen identifiziert:
-Typ 1 (Jacob, Nele, Wohnzimmer, Schlafzimmer):
-
-Fan: quiet, low, medium, medium_high, high, auto, strong
-Swing: stopped, fixedtop, fixedmiddletop, fixedmiddle, fixedmiddlebottom, fixedbottom, rangefull
-Swing Horizontal: stopped, fixedleft, fixedcenterleft, fixedcenter, fixedcenterright, fixedright, fixedleftright, rangecenter, rangefull
-Keine Presets
-
-Typ 2 (Finn, Büro):
-
-Fan: auto, low, medium, high (KEINE quiet!)
-Swing: off, on (einfacher)
-Preset: none, sleep (hat Sleep-Modus!)
-KEINE Swing Horizontal
-
-Dashboard-Struktur:
-docs/dashboards/
-├── dashboard-main.yaml              # Beleuchtung (bestehend)
-└── dashboard-main-klima.yaml        # Klima-System (neu)
-
-Klima-Dashboard Layout:
-├── System Übersicht (column_span: 1)
-│   ├── AirCos aktiv Counter
-│   ├── Außentemperatur
-│   └── Ø Innentemperatur
-├── Schnell-Aktionen (column_span: 1)  
-│   ├── Alle AUS (rot)
-│   ├── Nachtmodus (blau)
-│   ├── Komfort-Modus (grün)
-│   └── Schlafbooster (orange)
-└── Klimaanlagen (column_span: 2)
-    ├── Wohnzimmer, Büro, Schlafzimmer
-    └── Finn, Nele, Jacob
-Entitäten-Mapping:
-yaml# Klimaanlagen
-climate.wohnzimmer    # Typ 1
-climate.buero         # Typ 2  
-climate.schlafzimmer  # Typ 1
-climate.finn          # Typ 2
-climate.nele          # Typ 1
-climate.jacob         # Typ 1
-
-# Helper
-input_boolean.schlafbooster_aktiv
-
-# Scripts
-script.klima_alle_aus
-script.klima_nachtmodus
-script.klima_komfort_modus  
-script.klima_schlafbooster
-script.klima_schlafbooster_phase2
-Technische Erkenntnisse
-Klima-Integration:
-
-2-Schritt-Einschaltung: Essential für korrekte HVAC-Aktivierung
-Typ-spezifische Scripts: Notwendig für unterschiedliche Hardware
-Delays: 2s nach turn_on, 1s nach set_hvac_mode optimal
-Sleep-Preset: Typ 2 Klimaanlagen haben intelligenten Sleep-Modus
-
-Dashboard-Entwicklung bestätigt:
-
-better-thermostat-ui-card: Beste Lösung für Klimasteuerung
-mushroom-cards: Perfekt für Status-Übersicht
-button-card: Ideal für Schnell-Aktionen
-Sections-Layout: Responsive und übersichtlich
-Keine grid_options: Automatisches Layout funktioniert besser
-
-Git-Workflow bewährt:
-
-Block-System: Für Scripts/Automations beibehalten
-Vollständige Dateien: Immer komplette YAML-Dateien
-Strukturierte Commits: Feature:, Fix:, Config: Kategorien
-Session-Dokumentation: Template-System für Kontinuität
-
-Intelligente Features
-Schlafbooster-System:
-Phase 1 (manuell): 21°C + max Gebläse + Oszillation → schnelle Kühlung
-Phase 2 (automatisch): Bei 21.5°C erreicht → 22°C + leise + stopped → Schlafmodus
-Automation: Überwacht alle Schlafräume, wechselt automatisch
-Sicherheit: input_boolean verhindert mehrfache Auslösung
-Modi-Logik:
-
-Alle AUS: Komplett ausschalten
-Nachtmodus: Nur Schlafräume, leise, optimiert für Schlafen
-Komfort-Modus: Alle Klimaanlagen, 23°C Universaltemperatur
-Schlafbooster: Intelligent, 2-phasig, automatischer Wechsel
-
-Offene Punkte
-Für nächste Session zu prüfen:
-
-Dashboard aktivieren: In configuration.yaml Dashboard-Link einfügen
-Mobile Ansicht: Responsive Design auf verschiedenen Geräten testen
-Performance: Dashboard-Ladezeiten bei Live-Updates messen
-Außentemperatur: sensor.aussentemperatur durch echten Sensor ersetzen
-
-Mögliche Erweiterungen:
-
-Zeitgesteuerte Automationen: Automatischer Nachtmodus um 22:00
-Anwesenheits-Logik: Klimasteuerung nur bei Anwesenheit
-Wetter-Integration: Automatische Modi basierend auf Außentemperatur
-Energie-Monitoring: Verbrauchsanzeige für jede Klimaanlage
-Szenen-Integration: Klima-Modi in Haus-Szenen einbinden
-
-Bekannte Limitationen:
-
-Dashboard erfordert better-thermostat-ui-card HACS-Integration
-input_boolean.schlafbooster_aktiv muss vor Automation-Test erstellt werden
-2-Schritt-Logik verlängert Script-Ausführung um 3 Sekunden
-
-Nächste geplante Features
-Dashboard-Erweiterung (Priorität: Mittel)
-
-Energie-Sektion: Verbrauchsanzeige und Kosten
-Sicherheit-Sektion: Türen, Fenster, Kameras
-Garten-Sektion: Bewässerung, Wetter, Sensoren
-
-Erweiterte Klimasteuerung (Priorität: Niedrig)
-
-Zeitpläne: Wochenprogramm für verschiedene Modi
-Eco-Modi: Energiesparende Temperaturen mit Zeitsteuerung
-Vacation-Modus: Minimal-Betrieb bei Abwesenheit
-
-System-Optimierung (Priorität: Niedrig)
-
-Automation-Konsolidierung: Weniger Scripts, mehr Conditional Logic
-Template-Optimierung: Bessere Performance bei Status-Übersicht
-Error-Handling: Fallback bei nicht verfügbaren Klimaanlagen
-
-Entwicklungsumgebung
-Setup bestätigt (Session 2025-08-22):
-
-Home Assistant: Port 8123, stabil
-SSH-Zugang: Funktioniert
-VS Code: Git-Integration optimal
-Studio Code Server: YAML-Syntax-Validierung aktiv
-HACS-Integrationen: better-thermostat-ui-card, mushroom, button-card
-
-Klimaanlagen-Hardware:
-
-6 Klimaanlagen über Zigbee/MQTT verfügbar
-2 verschiedene Typen identifiziert und unterstützt
-Alle Modi und Features funktional getestet
-
-Session-Abschluss Status
-Erfolgreich abgeschlossen:
-✅ Klima-Dashboard: Vollständig implementiert und funktional
-✅ 4 Schnell-Modi: Alle AUS, Nachtmodus, Komfort, Schlafbooster
-✅ 2-Schritt-Logik: Klimaanlagen schalten korrekt ein
-✅ Typ-spezifische Steuerung: Beide Hardware-Typen unterstützt
-✅ Intelligent Schlafbooster: 2-Phasen-System mit Auto-Wechsel
-✅ YAML-Syntax: Alle Dateien validiert und korrekt
-✅ Git: Alle Änderungen committed und dokumentiert
-Für nächste Session vorbereitet:
-📋 Sofort einsetzbar: Komplettes Klima-System funktional
-📋 Dokumentiert: Alle technischen Details und Erkenntnisse erfasst
-📋 Erweiterbar: Grundlage für weitere Automation-Systeme gelegt
-Arbeitsweise für nächste Session
-Session-Start Routine:
-bash# Status prüfen
+Nächste Session - Arbeitsschritte
+1. Sicherheit SOFORT prüfen:
+bash# ESPHome Passwort-Check
+grep "password:" esphome/bewcmp.yaml
+# Sollte "!secret wifi_password" zeigen, NICHT das echte Passwort!
+2. System-Check:
+bash# Git-Status
 git status
-git log --oneline -3
+git log --oneline -5
+
+# Config validieren
 ha core check
 
-# Backup vor Änderungen
+# Automationen testen (über UI!)
+3. Projekt-Workflow:
+bash# VOR Änderungen:
 git add . && git commit -m "Backup vor Session $(date +%Y-%m-%d)"
-Testing-Workflow:
-bash# Nach jeder Änderung
-ha core check
 
-# Bei Config-Änderungen  
-ha core restart
-
-# Dashboard-Test über UI
-# Funktionstest aller Buttons
-Git-Operationen (Session-Ende):
-bash# Einzelne Befehle oder mit &&
-git add .
-git commit -m "Feature: [Beschreibung]"
+# NACH erfolgreichem Test:
+git add [dateien]
+git commit -m "Feature/Fix/Critical: [Beschreibung]"
 git push
+Erfolgs-Metriken Session 23.08.2025
+✅ Kritisches Problem gelöst: Stromspitzen durch Delays verhindert
+✅ Syntax modernisiert: HA 2024.10+ plural forms implementiert
+✅ 5 Automationen korrigiert: Alle mit Sicherheits-Delays
+✅ 1 Script korrigiert: Master-Button mit Delays
+✅ Winter-Automation getestet: skip_condition Methode validiert
+✅ Dokumentation verbessert: Reload-Workflow geklärt
+✅ Sicherheitslücke identifiziert: ESPHome WLAN-Passwort
+MERKE für nächste Session
+⚡ NIEMALS vergessen:
 
-# Oder als eine Zeile:
-git add . && git commit -m "Feature: [Beschreibung]" && git push
-Nächste Schritte (Priorität):
+DELAYS zwischen Lampen - 500ms PFLICHT! Sicherung!
+Reload NUR über UI - CLI funktioniert nicht zuverlässig
+Block-System einhalten - Vollständige Blöcke oder Dateien
+ESPHome secrets.yaml - Sicherheitslücke MUSS geschlossen werden!
+HA 2024.10+ Syntax - plural forms (triggers, actions, conditions)
 
-Dashboard-Link: configuration.yaml um Klima-Dashboard erweitern
-Mobile Test: Responsive Design auf Tablet/Handy validieren
-Performance Test: Live-Updates und Ladezeiten messen
-Weitere Systeme: Energie, Sicherheit, Garten nach Klima-Muster
-Integration: Klima-Modi in bestehende Haus-Automationen einbinden
+📋 Quick-Reference:
+yaml# Korrekte Delay-Syntax:
+- delay: 
+    milliseconds: 500  # Für kurze Delays
+- delay: 2  # Für Sekunden
 
-Erfolgs-Kennzahlen Session 2025-08-22
-✅ Features implementiert: 1 komplettes Klima-Steuerungssystem
-✅ Scripts erstellt: 5 (4 Modi + 1 Auto-Phase2)
-✅ Dashboard-Karten: 13 (3 Status + 4 Buttons + 6 Thermostate)
-✅ Automation: 1 intelligente Schlafbooster-Auto-Umschaltung
-✅ Hardware-Typen: 2 verschiedene Klimaanlagen-Typen unterstützt
-✅ Problem gelöst: 2-Schritt-HVAC-Einschaltung entwickelt
-✅ Testing: Alle Modi funktional validiert
-✅ Git-Commits: Strukturiert mit vollständiger Dokumentation
-Nächste Session bereit: Komplettes Klima-System produktiv einsatzbereit! Basis für weitere Smart-Home-Systeme gelegt.
+# Automation testen:
+service: automation.trigger
+target:
+  entity_id: automation.[name]
+data:
+  skip_condition: true  # Optional - ignoriert Bedingungen
+🎯 Winter-Automation Info:
+
+Läuft nur wenn Sonnenaufgang > 07:00 Uhr
+Aktuell (August): Bedingung NICHT erfüllt
+Oktober-März: Bedingung erfüllt
+Test mit skip_condition erfolgreich
+
 
 Session-Ende Checklist:
 
- Alle Scripts funktional getestet
- Dashboard UI validiert
- YAML-Syntax korrekt
- Git committed und gepusht
- Session-Template aktualisiert
+ Delays in ALLEN Multi-Lampen-Automationen/Scripts
+ Syntax auf HA 2024.10+ aktualisiert
+ Git committed mit CRITICAL-Hinweis
  Technische Erkenntnisse dokumentiert
- Nächste Schritte definiert
- Offene Punkte priorisiert
+ Projekt-Workflow-Regeln durchgesetzt
+ ESPHome secrets.yaml erstellt (⚠️ OFFEN - KRITISCH!)
+ Weitere Steckdosen eingebunden (OFFEN)
 
-Für nächste Session: Klima-System vollständig einsatzbereit - ready für Erweiterungen oder neue Systeme!
+Status: System läuft stabil mit korrigierten Delays und moderner Syntax. ESPHome-Sicherheitslücke muss in nächster Session SOFORT geschlossen werden! 🚨
+Für nächste Session: ERSTE AKTION = ESPHome Passwort sichern!
