@@ -1,54 +1,69 @@
-# Home Assistant spezifische Dateien die NICHT ins Git gehören
+# === HOME ASSISTANT CORE ===
+# Logs und Datenbanken
 *.log
+*.log.*
 *.db
 *.db-shm
 *.db-wal
 home-assistant.log*
-*.log.*
 *.fault
-.uuid
+
+# System-Dateien
 .HA_VERSION
+.uuid
 .cloud/
 .storage/
 blueprints/
 deps/
 tts/
-www/
-.google.token
+www/downloads/  # Falls Downloads im www Ordner
+
+# === SENSIBLE DATEN ===
 secrets.yaml
 known_devices.yaml
-.ios.conf
+.google.token
 .spotify-token-cache
 .homekit.state
+.ios.conf
+ip_bans.yaml
 
-# Backups
+# === ZIGBEE2MQTT ===
+zigbee2mqtt/state.json
+zigbee2mqtt/*.json.bak
+zigbee2mqtt/log/
+zigbee2mqtt/coordinator_backup.json  # Neu hinzugefügt!
+
+# === ESPHOME ===
+esphome/.esphome/
+esphome/secrets.yaml  # WICHTIG - fehlt noch bei dir!
+esphome/*.bin
+esphome/*.elf
+
+# === BACKUPS ===
 backups/
 backup/
 *.backup
 
-# Temporary files
+# === TEMPORARY FILES ===
 *.tmp
 *.bak
 *~
 .DS_Store
 Thumbs.db
 
-# IDE/Editor files
+# === IDE/EDITOR ===
 .vscode/settings.json
 .idea/
 
-# Custom components (optional - entscheiden Sie selbst)
-custom_components/
-
-# Add-on configs (können sensible Daten enthalten)
+# === CUSTOM COMPONENTS & ADD-ONS ===
+custom_components/  # Optional
 addons/
 
-# HACS
+# === HACS ===
 hacs/
+www/community/  # HACS installiert hier Frontend-Komponenten
 
-# Node modules falls vorhanden
+# === NODE/PYTHON ===
 node_modules/
-
-# Python Cache
 __pycache__/
-*.pyc
+*.pyccustom_components/
