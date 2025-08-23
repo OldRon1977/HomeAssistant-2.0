@@ -1,3 +1,4 @@
 state.json
 *.json.bak
 log/
+coordinator_backup.json

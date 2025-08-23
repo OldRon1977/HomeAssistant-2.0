@@ -1,0 +1,100 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured",
+            "already_in_progress": "Configuration flow is already in progress",
+            "cannot_connect": "Failed to connect. Please check hostname/ip.",
+            "cannot_retrieve_device_info": "Successfully connected, but unable to retrieve the device information",
+            "invalid_auth": "Invalid authentication. Please check user/group and password.",
+            "unknown": "Unexpected error"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect. Please check hostname/ip.",
+            "cannot_retrieve_device_info": "Successfully connected, but unable to retrieve the device information",
+            "invalid_auth": "Invalid authentication. Please check user/group and password.",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "accesslong": "Interface"
+                },
+                "data_description": {
+                },
+                "description": "## Webconnect\nDevices that supports the webconnect standard. Many SMA devices from end of 2014 to 2023. (e.g. Sunny Tripower Smart Energy, Sunny Boy Storage)\n\n## EnnoxOS\nNewer devices from SMA from approx. 2023. (e.g. Tripower X, EVCharger)\n\n## Speedwire Energymeter\nSunny Home Manager 2 as well Energymeter 10/20\n\n## Speedwire (unstable)\nAlmost all SMA devices with a network connection. Only unencrypted communication is supported. The password for the account \"user\" or \"installer\" is needed.\nThis variant is known to not work with all devices. The reason for this is unclear.",
+                "title": "Set up SMA Solar"
+          },
+          "details": {
+                "data": {
+                    "group": "User or Group",
+                    "host": "Host",
+                    "password": "Password",
+                    "ssl": "Uses an SSL certificate",
+                    "verify_ssl": "Verify SSL certificate"
+                },
+                "data_description": {
+                    "host": "The hostname or IP address of your SMA device."
+                },
+                "description": "Enter your SMA device information.",
+                "title": "Set up SMA Solar"
+            },
+            "deviceselection": {
+                "data": {
+                    "device": "Device"
+                },
+                "data_description": {
+                    "device": "Special case ennexOS:\n\nThe measured values are supplied in two parts. Once for the device (IGULD:SELF) and once for the whole plant (Plant:1). They may also mirror the data from the energy meters (EM:0174-XXXXXXXXXX)."
+                },
+                "description": "The following devices were found.",
+                "title": "Device selection"
+            }
+             
+      }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Update configuration",
+        "data": {
+          "scaninterval": "Update interval"
+        },
+        "description": "After a change, HA must be restarted manually.\n\nValues of less than 5 seconds significantly increase the load for HA and can overload slow computers.\nIn any case, please specify deactivate any sensors that are not required."
+      },
+      "no_update": {
+        "title": "No update needed",
+        "description": "There is nothing to update."
+      }
+    }
+  },
+  "services": {
+    "set_value": {
+        "description": "Set a Value.",
+        "fields": {
+            "entity_id": {
+                "description": "Parameter to be set.",
+                "name": "Parameter"
+            },
+            "value": {
+                "description": "Value.",
+                "name": "Value"
+            }
+        },
+        "name": "Set Parameter"
+    },
+    "get_value_range": {
+        "description": "Returns the permitted settings for a parameter.",
+        "fields": {
+            "entity_id": {
+                "description": "Parameter.",
+                "name": "Parameter"
+            }
+        },
+        "name": "Get Settings"
+    },
+    "run_discovery": {
+        "description": "Tries to discovery SMA-Devices.",
+        "name": "Run Discovery"
+    }
+    }
+
+}
