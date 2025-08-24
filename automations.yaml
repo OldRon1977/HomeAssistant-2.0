@@ -1,336 +1,245 @@
-# === BLOCK: AUTOMATION_LICHT_SONNENUNTERGANG ===
-# Zweck: Alle Lichter (Wohnzimmer + Außen) bei Sonnenuntergang einschalten
-# Status: ✅ Getestet - DELAYS ERFORDERLICH für Sicherung!
-# Erstellt: 2025-08-22
-# Geändert: 2025-08-23 - HA 2024.10+ Syntax, MIT 0.5s Delays (Stromspitzen vermeiden!)
-# Abhängigkeiten: sun.sun, switch.steckdose_1-5, switch.licht_haustur_licht_haustur
-
 - id: licht_sonnenuntergang
-  alias: "Licht - Sonnenuntergang alle an"
-  description: "Schaltet alle Lichter bei Sonnenuntergang mit 0.5s Verzögerung ein"
+  alias: Licht - Sonnenuntergang alle an
+  description: Schaltet alle Lichter bei Sonnenuntergang mit 0.5s Verzögerung ein
   triggers:
-    - trigger: sun
-      event: sunset
+  - trigger: sun
+    event: sunset
   actions:
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_1
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_2
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_3
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_4
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_5
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.licht_haustur_licht_haustur
-
-# === END BLOCK: AUTOMATION_LICHT_SONNENUNTERGANG ===
-
-# === BLOCK: AUTOMATION_LICHT_NACHTABSCHALTUNG ===
-# Zweck: Wohnzimmerlichter um 23:00 ausschalten
-# Status: ✅ Getestet - DELAYS ERFORDERLICH!
-# Erstellt: 2025-08-22
-# Geändert: 2025-08-23 - HA 2024.10+ Syntax, MIT Delays
-# Abhängigkeiten: switch.steckdose_1-5
-
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_1
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_2
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_3
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_4
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_5
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.licht_haustur_licht_haustur
 - id: licht_nachtabschaltung
-  alias: "Licht - Nachtabschaltung 23:00"
-  description: "Schaltet Wohnzimmerlichter um 23:00 mit 0.5s Verzögerung aus"
+  alias: Licht - Nachtabschaltung 23:00
+  description: Schaltet Wohnzimmerlichter um 23:00 mit 0.5s Verzögerung aus
   triggers:
-    - trigger: time
-      at: "23:00:00"
+  - trigger: time
+    at: '23:00:00'
   actions:
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_1
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_2
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_3
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_4
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_5
-
-# === END BLOCK: AUTOMATION_LICHT_NACHTABSCHALTUNG ===
-
-# === BLOCK: AUTOMATION_LICHT_SONNENAUFGANG ===
-# Zweck: Außenlampe bei Sonnenaufgang ausschalten
-# Status: ✅ Getestet
-# Erstellt: 2025-08-22
-# Geändert: 2025-08-23 - HA 2024.10+ Syntax
-# Abhängigkeiten: sun.sun, switch.licht_haustur_licht_haustur
-
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_1
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_2
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_3
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_4
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_5
 - id: licht_sonnenaufgang
-  alias: "Licht - Sonnenaufgang Außenlampe aus"
-  description: "Schaltet Außenlampe bei Sonnenaufgang aus"
+  alias: Licht - Sonnenaufgang Außenlampe aus
+  description: Schaltet Außenlampe bei Sonnenaufgang aus
   triggers:
-    - trigger: sun
-      event: sunrise
+  - trigger: sun
+    event: sunrise
   actions:
-    - action: switch.turn_off
-      target:
-        entity_id: switch.licht_haustur_licht_haustur
-
-# === END BLOCK: AUTOMATION_LICHT_SONNENAUFGANG ===
-
-# === BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AN ===
-# Zweck: Wohnzimmerlichter um 07:00 an (nur im Winter wenn Sonnenaufgang nach 07:00)
-# Status: ✅ Getestet - DELAYS ERFORDERLICH!
-# Erstellt: 2025-08-22
-# Geändert: 2025-08-23 - HA 2024.10+ Syntax, MIT 0.5s Delays
-# Abhängigkeiten: sun.sun, switch.steckdose_1-5
-
+  - action: switch.turn_off
+    target:
+      entity_id: switch.licht_haustur_licht_haustur
 - id: licht_winter_morgen_an
-  alias: "Licht - Winter 07:00 Wohnzimmer an"
-  description: "Schaltet Wohnzimmerlichter um 07:00 ein, nur wenn Sonnenaufgang nach 07:00"
+  alias: Licht - Winter 07:00 Wohnzimmer an
+  description: Schaltet Wohnzimmerlichter um 07:00 ein, nur wenn Sonnenaufgang vor
+    07:00
   triggers:
-    - trigger: time
-      at: "07:00:00"
+  - trigger: time
+    at: 07:00:00
   conditions:
-    - condition: template
-      value_template: "{{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}"
+  - condition: template
+    value_template: '{{ as_timestamp(state_attr(''sun.sun'', ''next_rising'')) < as_timestamp(today_at(''07:00''))
+      }}'
   actions:
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_1
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_2
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_3
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_4
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_on
-      target:
-        entity_id: switch.steckdose_5
-
-# === END BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AN ===
-
-# === BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AUS ===
-# Zweck: Wohnzimmerlichter um 08:00 aus (nur im Winter wenn sie um 07:00 angingen)
-# Status: ✅ Getestet - DELAYS ERFORDERLICH!
-# Erstellt: 2025-08-22
-# Geändert: 2025-08-23 - HA 2024.10+ Syntax, MIT 0.5s Delays
-# Abhängigkeiten: sun.sun, switch.steckdose_1-5
-
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_1
+    data: {}
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_2
+    data: {}
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_3
+    data: {}
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_4
+    data: {}
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_on
+    target:
+      entity_id: switch.steckdose_5
+    data: {}
 - id: licht_winter_morgen_aus
-  alias: "Licht - Winter 08:00 Wohnzimmer aus"
-  description: "Schaltet Wohnzimmerlichter um 08:00 aus, nur wenn Sonnenaufgang nach 07:00"
+  alias: Licht - Winter 08:00 Wohnzimmer aus
+  description: Schaltet Wohnzimmerlichter um 08:00 aus, nur wenn Sonnenaufgang vor
+    07:00
   triggers:
-    - trigger: time
-      at: "08:00:00"
+  - trigger: time
+    at: 08:00:00
   conditions:
-    - condition: template
-      value_template: "{{ as_timestamp(state_attr('sun.sun', 'next_rising')) > as_timestamp(today_at('07:00')) }}"
+  - condition: template
+    value_template: '{{ as_timestamp(state_attr(''sun.sun'', ''next_rising'')) < as_timestamp(today_at(''07:00''))
+      }}'
   actions:
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_1
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_2
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_3
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_4
-    - delay: 
-        milliseconds: 500
-    - action: switch.turn_off
-      target:
-        entity_id: switch.steckdose_5
-
-# === END BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AUS ===
-
-# === BLOCK: AUTOMATION_KRITISCHE_INFRASTRUKTUR ===
-# Zweck: Hält lebensnotwendige Geräte immer eingeschaltet (Stromausfall-Schutz)
-# Status: 🔄 Neu
-# Erstellt: 2025-08-22
-# Trigger: Alle 5min + HA-Start (Stromausfall-Recovery)
-# Abhängigkeiten: 12 kritische Switches (Kühlschränke, Heizung, Technik)
-# Wichtig: Verhindert Lebensmittelverderb und kalte Wohnung im Winter
-
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_1
+    data: {}
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_2
+    data: {}
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_3
+    data: {}
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_4
+    data: {}
+  - delay:
+      milliseconds: 500
+  - action: switch.turn_off
+    target:
+      entity_id: switch.steckdose_5
+    data: {}
 - id: kritische_infrastruktur_immer_an
-  alias: "Kritische Infrastruktur - Immer An"
-  description: "Stellt sicher, dass kritische Geräte nach Stromausfall wieder eingeschaltet werden"
+  alias: Kritische Infrastruktur - Immer An
+  description: Stellt sicher, dass kritische Geräte nach Stromausfall wieder eingeschaltet
+    werden
   trigger:
-    # Jede Minute prüfen
-    - trigger: time_pattern
-      minutes: "/1"
-    # Nach Home Assistant Start (Stromausfall-Recovery)
-    - trigger: homeassistant
-      event: start
+  - trigger: time_pattern
+    minutes: /1
+  - trigger: homeassistant
+    event: start
   action:
-    # Alle kritischen Switches einschalten (idempotent)
-    - action: switch.turn_on
-      target:
-        entity_id:
-          # Kühlgeräte - KRITISCH für Lebensmittel
-          - switch.kuhlschrank
-          - switch.kuhlschrank_keller
-          - switch.froster_kuche
-          # Wasser/Heizung - KRITISCH für Wohnen
-          - switch.steckdose_31_heizung
-          - switch.steckdose_23_wasserenthaerter
-          - switch.steckdose_26_franke_heisswasser
-          - switch.steckdose_27_franke_chiller
-          # Haushaltsgeräte - WICHTIG für Alltag
-          - switch.steckdose_21_waschmaschine
-          - switch.steckdose_22_trockner
-          - switch.steckdose_30_spuelmaschine
-          # Technik-Infrastruktur - KRITISCH für System
-          - switch.steckdose_34_tp_link_switch
-          - switch.espsomfy
-
-# === END BLOCK: AUTOMATION_KRITISCHE_INFRASTRUKTUR ===
-
-# === BLOCK: AUTOMATION_SCHLAFBOOSTER_PHASE2_TRIGGER ===
-# Zweck: Automatischer Wechsel von Schlafbooster Phase 1 zu Phase 2
-# Status: 🔄 Neu
-# Erstellt: 2025-08-22
-# Abhängigkeiten: input_boolean.schlafbooster_aktiv, climate Entitäten
-
-- id: schlafbooster_phase2_trigger
-  alias: "Schlafbooster - Auto Wechsel zu Phase 2"
-  description: "Wechselt automatisch in leisen Modus wenn 21°C erreicht"
-  trigger:
-    # Überwacht alle Schlafraum-Temperaturen
-    - trigger: numeric_state
+  - action: switch.turn_on
+    target:
       entity_id:
-        - climate.schlafzimmer
-        - climate.finn
-        - climate.nele
-        - climate.jacob
-      attribute: current_temperature
-      below: 21.5  # Etwas über 21°C um Schwankungen zu vermeiden
-  
+      - switch.kuhlschrank
+      - switch.kuhlschrank_keller
+      - switch.froster_kuche
+      - switch.steckdose_31_heizung
+      - switch.steckdose_23_wasserenthaerter
+      - switch.steckdose_26_franke_heisswasser
+      - switch.steckdose_27_franke_chiller
+      - switch.steckdose_21_waschmaschine
+      - switch.steckdose_22_trockner
+      - switch.steckdose_30_spuelmaschine
+      - switch.steckdose_34_tp_link_switch
+      - switch.espsomfy
+- id: schlafbooster_phase2_trigger
+  alias: Schlafbooster - Auto Wechsel zu Phase 2
+  description: Wechselt automatisch in leisen Modus wenn 21°C erreicht
+  trigger:
+  - trigger: numeric_state
+    entity_id:
+    - climate.schlafzimmer
+    - climate.finn
+    - climate.nele
+    - climate.jacob
+    attribute: current_temperature
+    below: 21.5
   condition:
-    # Nur ausführen wenn Schlafbooster aktiv ist
-    - condition: state
-      entity_id: input_boolean.schlafbooster_aktiv
-      state: 'on'
-    
-    # Und mindestens ein Raum die Zieltemperatur erreicht hat
-    - condition: template
-      value_template: >
-        {{ 
-          state_attr('climate.schlafzimmer', 'current_temperature') <= 21.5 or
-          state_attr('climate.finn', 'current_temperature') <= 21.5 or
-          state_attr('climate.nele', 'current_temperature') <= 21.5 or
-          state_attr('climate.jacob', 'current_temperature') <= 21.5
-        }}
-  
+  - condition: state
+    entity_id: input_boolean.schlafbooster_aktiv
+    state: 'on'
+  - condition: template
+    value_template: "{{ \n  state_attr('climate.schlafzimmer', 'current_temperature')
+      <= 21.5 or\n  state_attr('climate.finn', 'current_temperature') <= 21.5 or\n
+      \ state_attr('climate.nele', 'current_temperature') <= 21.5 or\n  state_attr('climate.jacob',
+      'current_temperature') <= 21.5\n}}\n"
   action:
-    # Kurz warten um sicherzugehen dass Temperatur stabil ist
-    - delay: 30
-    
-    # In Phase 2 wechseln
-    - action: script.turn_on
-      target:
-        entity_id: script.klima_schlafbooster_phase2
-    
-    # Benachrichtigung senden (optional)
-    - action: persistent_notification.create
-      data:
-        title: "Schlafbooster"
-        message: "Zieltemperatur erreicht - wechsle in leisen Nachtmodus"
-        notification_id: schlafbooster_phase2
-
-# === END BLOCK: AUTOMATION_SCHLAFBOOSTER_PHASE2_TRIGGER ===
-
-# === BLOCK: AUTOMATION_DACHLUKE_TIMER_RESTART ===
-# Zweck: Timer bei jeder Dachluke-Positionsänderung neu starten mit variabler Dauer
-# Status: 🔧 Template korrigiert
-# Erstellt: 2025-08-23
-# Abhängigkeiten: cover.strom_dachluke_unten_dachluke_bad_unten, timer.dachluke_auto_close, input_number.dachluke_timer_minuten
-
+  - delay: 30
+  - action: script.turn_on
+    target:
+      entity_id: script.klima_schlafbooster_phase2
+  - action: persistent_notification.create
+    data:
+      title: Schlafbooster
+      message: Zieltemperatur erreicht - wechsle in leisen Nachtmodus
+      notification_id: schlafbooster_phase2
 - id: dachluke_timer_restart
-  alias: "Dachluke - Timer bei Positionsänderung starten"
-  description: "Startet Timer bei jeder Dachluke-Bewegung mit einstellbarer Dauer"
+  alias: Dachluke - Timer bei Positionsänderung starten
+  description: Startet Timer bei jeder Dachluke-Bewegung mit einstellbarer Dauer
   trigger:
-    - trigger: state
-      entity_id: cover.strom_dachluke_unten_dachluke_bad_unten
-      attribute: current_position
+  - trigger: state
+    entity_id: cover.strom_dachluke_unten_dachluke_bad_unten
+    attribute: current_position
   action:
-    - action: timer.cancel
-      entity_id: timer.dachluke_auto_close
-    - action: timer.start
-      entity_id: timer.dachluke_auto_close
-      data:
-        duration: >
-          {% set minutes = states('input_number.dachluke_timer_minuten') | int %}
-          {{ '%02d:%02d:00' | format(0, minutes) }}
+  - action: timer.cancel
+    entity_id: timer.dachluke_auto_close
+  - action: timer.start
+    entity_id: timer.dachluke_auto_close
+    data:
+      duration: '{% set minutes = states(''input_number.dachluke_timer_minuten'')
+        | int %} {{ ''%02d:%02d:00'' | format(0, minutes) }}
 
-# === END BLOCK: AUTOMATION_DACHLUKE_TIMER_RESTART ===
-
-# === BLOCK: AUTOMATION_DACHLUKE_AUTO_CLOSE ===
-# Zweck: Dachluke automatisch schließen nach Timer-Ablauf
-# Status: ✅ Getestet
-# Erstellt: 2025-08-23
-# Abhängigkeiten: timer.dachluke_auto_close, cover.strom_dachluke_unten_dachluke_bad_unten
-
+        '
 - id: dachluke_auto_close
-  alias: "Dachluke - Automatisch schließen nach Timer"
-  description: "Schließt Dachluke auf 0% nach Timer-Ablauf"
+  alias: Dachluke - Automatisch schließen nach Timer
+  description: Schließt Dachluke auf 0% nach Timer-Ablauf
   trigger:
-    - trigger: event
-      event_type: timer.finished
-      event_data:
-        entity_id: timer.dachluke_auto_close
+  - trigger: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.dachluke_auto_close
   condition:
-    - condition: template
-      value_template: "{{ state_attr('cover.strom_dachluke_unten_dachluke_bad_unten', 'current_position') | int > 0 }}"
+  - condition: template
+    value_template: '{{ state_attr(''cover.strom_dachluke_unten_dachluke_bad_unten'',
+      ''current_position'') | int > 0 }}'
   action:
-    - action: cover.set_cover_position
-      entity_id: cover.strom_dachluke_unten_dachluke_bad_unten
-      data:
-        position: 0
-
-# === END BLOCK: AUTOMATION_DACHLUKE_AUTO_CLOSE ===
+  - action: cover.set_cover_position
+    entity_id: cover.strom_dachluke_unten_dachluke_bad_unten
+    data:
+      position: 0
