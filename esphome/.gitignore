@@ -19,5 +19,5 @@ build/
 # KRITISCH: secrets.yaml enthält WLAN-Passwort!
 secrets.yaml
 
-# Archive-Ordner kann ins Git (alte Configs ohne Secrets)
-# archive/ nur uncommentieren falls nicht gewünscht
+# Archive-Ordner mit alten Configs (NICHT ins Git)
+archive/archive/
