@@ -10,11 +10,11 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
-# === BLOCK: INPUT_BOOLEAN_SCHLAFBOOSTER ===
-# Zweck: Helper für Schlafbooster Status-Tracking
-# Status: 🔄 Neu
+# === BLOCK: INPUT_BOOLEAN_ALLE ===
+# Zweck: Alle Boolean Helper an einer Stelle
+# Status: ✅ Korrigiert - Duplicate Key behoben
 # Erstellt: 2025-08-22
-# Zu configuration.yaml hinzufügen
+# Geändert: 2025-08-25 - Zusammengeführt
 
 input_boolean:
   schlafbooster_aktiv:
@@ -22,11 +22,19 @@ input_boolean:
     icon: mdi:weather-windy
     initial: false
     
-# === END BLOCK: INPUT_BOOLEAN_SCHLAFBOOSTER ===
+  bewaesserung_zeitplan_1_aktiv:
+    name: "Zeitplan 1 aktiv"
+    icon: mdi:calendar-check
+    
+  bewaesserung_zeitplan_2_aktiv:
+    name: "Zeitplan 2 aktiv"
+    icon: mdi:calendar-check
+    
+# === END BLOCK: INPUT_BOOLEAN_ALLE ===
 
 # === BLOCK: TIMER_DACHLUKE_AUTO_CLOSE ===
 # Zweck: Timer für automatisches Schließen der Dachluke nach variabler Zeit
-# Status: 🔄 Bereinigt
+# Status: ✅ Bereinigt
 # Erstellt: 2025-08-23
 # Abhängigkeiten: cover.strom_dachluke_unten_dachluke_bad_unten, input_number.dachluke_timer_minuten
 
@@ -47,3 +55,49 @@ input_number:
     icon: mdi:timer-cog
 
 # === END BLOCK: TIMER_DACHLUKE_AUTO_CLOSE ===
+
+# === BLOCK: BEWÄSSERUNG_HELPERS ===
+# Zweck: Helper für Bewässerungs-Zeitpläne
+# Status: ✅ Überarbeitet - Overlap entfernt, input_boolean verschoben
+# Erstellt: 2025-08-24
+# Geändert: 2025-08-25 - Duplicate Key behoben
+
+# Zeitplan-Steuerung
+input_datetime:
+  bewaesserung_start_zeit_1:
+    name: "Bewässerung Startzeit 1"
+    has_date: false
+    has_time: true
+    icon: mdi:clock-start
+  
+  bewaesserung_start_zeit_2:
+    name: "Bewässerung Startzeit 2"
+    has_date: false
+    has_time: true
+    icon: mdi:clock-start
+
+# Tage-Auswahl für Zeitpläne
+input_select:
+  bewaesserung_zeitplan_1_tage:
+    name: "Zeitplan 1 - Tage"
+    options:
+      - "Täglich"
+      - "Werktags"
+      - "Wochenende"
+      - "Mo/Mi/Fr"
+      - "Di/Do/Sa"
+    initial: "Täglich"
+    icon: mdi:calendar-week
+    
+  bewaesserung_zeitplan_2_tage:
+    name: "Zeitplan 2 - Tage"
+    options:
+      - "Täglich"
+      - "Werktags"
+      - "Wochenende"
+      - "Mo/Mi/Fr"
+      - "Di/Do/Sa"
+    initial: "Mo/Mi/Fr"
+    icon: mdi:calendar-week
+
+# === END BLOCK: BEWÄSSERUNG_HELPERS ===
