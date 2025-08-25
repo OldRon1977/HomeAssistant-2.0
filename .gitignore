@@ -64,3 +64,4 @@ esphome/.esphome/
 esphome/secrets.yaml
 esphome/*.bin
 esphome/*.elf
+www/
