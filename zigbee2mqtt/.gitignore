@@ -2,3 +2,4 @@ state.json
 *.json.bak
 log/
 coordinator_backup.json
+zigbee2mqtt/coordinator_backup.json
