@@ -14,7 +14,7 @@ scene: !include scenes.yaml
 # Zweck: Alle Boolean Helper an einer Stelle
 # Status: ✅ Korrigiert - Duplicate Key behoben
 # Erstellt: 2025-08-22
-# Geändert: 2025-08-25 - Zusammengeführt
+# Geändert: 2025-08-25 - Zusammengefügt
 
 input_boolean:
   schlafbooster_aktiv:
@@ -56,11 +56,11 @@ input_number:
 
 # === END BLOCK: TIMER_DACHLUKE_AUTO_CLOSE ===
 
-# === BLOCK: BEWÄSSERUNG_HELPERS ===
-# Zweck: Helper für Bewässerungs-Zeitpläne
-# Status: ✅ Überarbeitet - Overlap entfernt, input_boolean verschoben
+# === BLOCK: BEWAESSERUNG_HELPERS ===
+# Zweck: Helper für Bewässerungs-Zeitpläne mit Smart Irrigation Support
+# Status: ✅ Überarbeitet - Smart Irrigation Auto-Modus
 # Erstellt: 2025-08-24
-# Geändert: 2025-08-25 - Duplicate Key behoben
+# Geändert: 2025-08-26 - Auto-Modus für Smart Irrigation
 
 # Zeitplan-Steuerung
 input_datetime:
@@ -76,28 +76,36 @@ input_datetime:
     has_time: true
     icon: mdi:clock-start
 
-# Tage-Auswahl für Zeitpläne
+# Tage-Auswahl für Zeitpläne - ERWEITERT für einzelne Wochentage + Auto
 input_select:
   bewaesserung_zeitplan_1_tage:
     name: "Zeitplan 1 - Tage"
     options:
       - "Täglich"
-      - "Werktags"
-      - "Wochenende"
-      - "Mo/Mi/Fr"
-      - "Di/Do/Sa"
-    initial: "Täglich"
+      - "Mo"
+      - "Di"
+      - "Mi"
+      - "Do"
+      - "Fr"
+      - "Sa"
+      - "So"
+      - "Auto"
+    initial: "Auto"
     icon: mdi:calendar-week
     
   bewaesserung_zeitplan_2_tage:
     name: "Zeitplan 2 - Tage"
     options:
       - "Täglich"
-      - "Werktags"
-      - "Wochenende"
-      - "Mo/Mi/Fr"
-      - "Di/Do/Sa"
-    initial: "Mo/Mi/Fr"
+      - "Mo"
+      - "Di"
+      - "Mi"
+      - "Do"
+      - "Fr"
+      - "Sa"
+      - "So"
+      - "Auto"
+    initial: "Auto"
     icon: mdi:calendar-week
 
-# === END BLOCK: BEWÄSSERUNG_HELPERS ===
+# === END BLOCK: BEWAESSERUNG_HELPERS ===

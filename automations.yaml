@@ -1,3 +1,11 @@
+# === BLOCK: AUTOMATION_LICHT_SONNENUNTERGANG ===
+# Zweck: Schaltet alle Lichter bei Sonnenuntergang ein
+# Status: ✅ Getestet - Delays implementiert
+# Erstellt: 2025-08-22
+# Geändert: 2025-08-23 - Delays hinzugefügt
+# Abhängigkeiten: switch.steckdose_1-5, switch.licht_haustur_licht_haustur
+# WICHTIG: 0.5s Delay zwischen Schaltungen wegen Stromspitzen!
+
 - id: licht_sonnenuntergang
   alias: Licht - Sonnenuntergang alle an
   description: Schaltet alle Lichter bei Sonnenuntergang mit 0.5s Verzögerung ein
@@ -33,6 +41,17 @@
   - action: switch.turn_on
     target:
       entity_id: switch.licht_haustur_licht_haustur
+
+# === END BLOCK: AUTOMATION_LICHT_SONNENUNTERGANG ===
+
+# === BLOCK: AUTOMATION_LICHT_NACHTABSCHALTUNG ===
+# Zweck: Schaltet Wohnzimmerlichter um 23:00 aus
+# Status: ✅ Getestet - Delays implementiert
+# Erstellt: 2025-08-22
+# Geändert: 2025-08-23 - Delays hinzugefügt
+# Abhängigkeiten: switch.steckdose_1-5
+# WICHTIG: 0.5s Delay zwischen Schaltungen wegen Stromspitzen!
+
 - id: licht_nachtabschaltung
   alias: Licht - Nachtabschaltung 23:00
   description: Schaltet Wohnzimmerlichter um 23:00 mit 0.5s Verzögerung aus
@@ -63,6 +82,15 @@
   - action: switch.turn_off
     target:
       entity_id: switch.steckdose_5
+
+# === END BLOCK: AUTOMATION_LICHT_NACHTABSCHALTUNG ===
+
+# === BLOCK: AUTOMATION_LICHT_SONNENAUFGANG ===
+# Zweck: Schaltet Außenlampe bei Sonnenaufgang aus
+# Status: ✅ Getestet
+# Erstellt: 2025-08-22
+# Abhängigkeiten: switch.licht_haustur_licht_haustur
+
 - id: licht_sonnenaufgang
   alias: Licht - Sonnenaufgang Außenlampe aus
   description: Schaltet Außenlampe bei Sonnenaufgang aus
@@ -73,6 +101,18 @@
   - action: switch.turn_off
     target:
       entity_id: switch.licht_haustur_licht_haustur
+
+# === END BLOCK: AUTOMATION_LICHT_SONNENAUFGANG ===
+
+# === BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AN ===
+# Zweck: Morgenbeleuchtung für Kinder im Winter
+# Status: ✅ Getestet mit skip_condition
+# Erstellt: 2025-08-22
+# Geändert: 2025-08-23 - Delays hinzugefügt
+# Abhängigkeiten: switch.steckdose_1-5, sun.sun
+# Bedingung: Nur wenn Sonnenaufgang nach 07:00 (Winter)
+# WICHTIG: 0.5s Delay zwischen Schaltungen wegen Stromspitzen!
+
 - id: licht_winter_morgen_an
   alias: Licht - Winter 07:00 Wohnzimmer an
   description: Schaltet Wohnzimmerlichter um 07:00 ein, nur wenn Sonnenaufgang vor
@@ -113,6 +153,18 @@
     target:
       entity_id: switch.steckdose_5
     data: {}
+
+# === END BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AN ===
+
+# === BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AUS ===
+# Zweck: Beendet Morgenbeleuchtung im Winter
+# Status: ✅ Getestet - Delays implementiert
+# Erstellt: 2025-08-22
+# Geändert: 2025-08-23 - Delays hinzugefügt
+# Abhängigkeiten: switch.steckdose_1-5, sun.sun
+# Bedingung: Nur wenn Sonnenaufgang nach 07:00 (Winter)
+# WICHTIG: 0.5s Delay zwischen Schaltungen wegen Stromspitzen!
+
 - id: licht_winter_morgen_aus
   alias: Licht - Winter 08:00 Wohnzimmer aus
   description: Schaltet Wohnzimmerlichter um 08:00 aus, nur wenn Sonnenaufgang vor
@@ -153,6 +205,16 @@
     target:
       entity_id: switch.steckdose_5
     data: {}
+
+# === END BLOCK: AUTOMATION_LICHT_WINTER_MORGEN_AUS ===
+
+# === BLOCK: AUTOMATION_KRITISCHE_INFRASTRUKTUR ===
+# Zweck: Stromausfall-Recovery für lebensnotwendige Geräte
+# Status: 🔄 Neu - Stromausfall-Schutz
+# Erstellt: 2025-08-23
+# Abhängigkeiten: 12 kritische Switches
+# WICHTIG: Läuft jede Minute + bei HA-Start - idempotent!
+
 - id: kritische_infrastruktur_immer_an
   alias: Kritische Infrastruktur - Immer An
   description: Stellt sicher, dass kritische Geräte nach Stromausfall wieder eingeschaltet
@@ -178,6 +240,15 @@
       - switch.steckdose_30_spuelmaschine
       - switch.steckdose_34_tp_link_switch
       - switch.espsomfy
+
+# === END BLOCK: AUTOMATION_KRITISCHE_INFRASTRUKTUR ===
+
+# === BLOCK: AUTOMATION_SCHLAFBOOSTER_PHASE2 ===
+# Zweck: Automatische Umschaltung Schlafbooster zu Nachtmodus
+# Status: 🔄 Neu - 2-Phasen-System
+# Erstellt: 2025-08-23
+# Abhängigkeiten: climate.*, input_boolean.schlafbooster_aktiv, script.klima_schlafbooster_phase2
+
 - id: schlafbooster_phase2_trigger
   alias: Schlafbooster - Auto Wechsel zu Phase 2
   description: Wechselt automatisch in leisen Modus wenn 21°C erreicht
@@ -209,6 +280,15 @@
       title: Schlafbooster
       message: Zieltemperatur erreicht - wechsle in leisen Nachtmodus
       notification_id: schlafbooster_phase2
+
+# === END BLOCK: AUTOMATION_SCHLAFBOOSTER_PHASE2 ===
+
+# === BLOCK: AUTOMATION_DACHLUKE_TIMER_RESTART ===
+# Zweck: Startet Timer bei Dachluke-Bewegung
+# Status: 🔧 Template korrigiert
+# Erstellt: 2025-08-23
+# Abhängigkeiten: cover.strom_dachluke_unten_dachluke_bad_unten, timer.dachluke_auto_close
+
 - id: dachluke_timer_restart
   alias: Dachluke - Timer bei Positionsänderung starten
   description: Startet Timer bei jeder Dachluke-Bewegung mit einstellbarer Dauer
@@ -226,6 +306,15 @@
         | int %} {{ ''%02d:%02d:00'' | format(0, minutes) }}
 
         '
+
+# === END BLOCK: AUTOMATION_DACHLUKE_TIMER_RESTART ===
+
+# === BLOCK: AUTOMATION_DACHLUKE_AUTO_CLOSE ===
+# Zweck: Schließt Dachluke nach Timer-Ablauf
+# Status: ✅ Getestet
+# Erstellt: 2025-08-23
+# Abhängigkeiten: cover.strom_dachluke_unten_dachluke_bad_unten, timer.dachluke_auto_close
+
 - id: dachluke_auto_close
   alias: Dachluke - Automatisch schließen nach Timer
   description: Schließt Dachluke auf 0% nach Timer-Ablauf
@@ -243,3 +332,165 @@
     entity_id: cover.strom_dachluke_unten_dachluke_bad_unten
     data:
       position: 0
+
+# === END BLOCK: AUTOMATION_DACHLUKE_AUTO_CLOSE ===
+
+# === BLOCK: BEWAESSERUNG_ZEITPLAN_1 ===
+# Zweck: Startet Bewässerung nach Zeitplan 1 mit Smart Irrigation Support
+# Status: ✅ Überarbeitet - Smart Irrigation Auto-Modus
+# Erstellt: 2025-08-25
+# Geändert: 2025-08-26 - Einzelne Wochentage + Auto-Modus
+# Abhängigkeiten: script.bewaesserung_auto, sensor.smart_irrigation_zone_*
+
+- id: bewaesserung_zeitplan_1
+  alias: "Bewässerung Zeitplan 1"
+  description: "Startet Bewässerung nach Zeitplan 1 mit Smart Irrigation Support"
+  mode: single
+  
+  triggers:
+    - trigger: time
+      at: input_datetime.bewaesserung_start_zeit_1
+  
+  conditions:
+    # Zeitplan muss aktiviert sein
+    - condition: state
+      entity_id: input_boolean.bewaesserung_zeitplan_1_aktiv
+      state: 'on'
+    
+    # System muss bereit sein
+    - condition: state
+      entity_id: binary_sensor.bewcmp_system_bereit
+      state: 'on'
+    
+    # Prüfe ob heute der richtige Tag ist
+    - condition: template
+      value_template: >
+        {% set tage = states('input_select.bewaesserung_zeitplan_1_tage') %}
+        {% set heute = now().strftime('%a') %}
+        {% set wochentage = {'Mon': 'Mo', 'Tue': 'Di', 'Wed': 'Mi', 'Thu': 'Do', 'Fri': 'Fr', 'Sat': 'Sa', 'Sun': 'So'} %}
+        {% set heute_de = wochentage.get(heute, '') %}
+        {% if tage == 'Täglich' %}
+          true
+        {% elif tage == 'Auto' %}
+          true
+        {% elif tage == heute_de %}
+          true
+        {% else %}
+          false
+        {% endif %}
+  
+  actions:
+    # Entscheide zwischen Auto-Modus und Standard
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ states('input_select.bewaesserung_zeitplan_1_tage') == 'Auto' }}"
+          sequence:
+            # Auto-Modus: Nutze Smart Irrigation
+            - action: script.bewaesserung_auto
+        
+      # Standard-Modus: Nutze eingestellte Zeiten
+      default:
+        - action: script.bewaesserung_standard
+
+# === END BLOCK: BEWAESSERUNG_ZEITPLAN_1 ===
+
+# === BLOCK: BEWAESSERUNG_ZEITPLAN_2 ===
+# Zweck: Startet Bewässerung nach Zeitplan 2 mit Smart Irrigation Support
+# Status: ✅ Überarbeitet - Smart Irrigation Auto-Modus
+# Erstellt: 2025-08-25
+# Geändert: 2025-08-26 - Einzelne Wochentage + Auto-Modus
+# Abhängigkeiten: script.bewaesserung_auto, sensor.smart_irrigation_zone_*
+
+- id: bewaesserung_zeitplan_2
+  alias: "Bewässerung Zeitplan 2"
+  description: "Startet Bewässerung nach Zeitplan 2 mit Smart Irrigation Support"
+  mode: single
+  
+  triggers:
+    - trigger: time
+      at: input_datetime.bewaesserung_start_zeit_2
+  
+  conditions:
+    # Zeitplan muss aktiviert sein
+    - condition: state
+      entity_id: input_boolean.bewaesserung_zeitplan_2_aktiv
+      state: 'on'
+    
+    # System muss bereit sein
+    - condition: state
+      entity_id: binary_sensor.bewcmp_system_bereit
+      state: 'on'
+    
+    # Prüfe ob heute der richtige Tag ist
+    - condition: template
+      value_template: >
+        {% set tage = states('input_select.bewaesserung_zeitplan_2_tage') %}
+        {% set heute = now().strftime('%a') %}
+        {% set wochentage = {'Mon': 'Mo', 'Tue': 'Di', 'Wed': 'Mi', 'Thu': 'Do', 'Fri': 'Fr', 'Sat': 'Sa', 'Sun': 'So'} %}
+        {% set heute_de = wochentage.get(heute, '') %}
+        {% if tage == 'Täglich' %}
+          true
+        {% elif tage == 'Auto' %}
+          true
+        {% elif tage == heute_de %}
+          true
+        {% else %}
+          false
+        {% endif %}
+  
+  actions:
+    # Entscheide zwischen Auto-Modus und Standard
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ states('input_select.bewaesserung_zeitplan_2_tage') == 'Auto' }}"
+          sequence:
+            # Auto-Modus: Nutze Smart Irrigation
+            - action: script.bewaesserung_auto
+        
+      # Standard-Modus: Nutze eingestellte Zeiten
+      default:
+        - action: script.bewaesserung_standard
+
+# === END BLOCK: BEWAESSERUNG_ZEITPLAN_2 ===
+
+# === BLOCK: BEWAESSERUNG_SICHERHEITS_STOP ===
+# Zweck: Stoppt Bewässerung nach 2 Stunden als Sicherheit - ÜBERARBEITET
+# Status: 🔄 Neu - ESPHome Sprinkler Integration
+# Erstellt: 2025-08-25
+# Abhängigkeiten: script.bewaesserung_stop
+# WICHTIG: Nutzt ESPHome Sprinkler Shutdown statt Notfall-Button
+
+- id: bewaesserung_sicherheits_stop
+  alias: "Bewässerung Sicherheits-Stop"
+  description: "Stoppt Bewässerung nach 2 Stunden als Sicherheit"
+  mode: restart
+  
+  triggers:
+    # Zone 1 läuft zu lange
+    - trigger: state
+      entity_id: binary_sensor.bewcmp_zone_1_aktiv
+      to: 'on'
+      for:
+        hours: 2
+    
+    # Zone 2 läuft zu lange
+    - trigger: state
+      entity_id: binary_sensor.bewcmp_zone_2_aktiv
+      to: 'on'
+      for:
+        hours: 2
+  
+  actions:
+    # Stoppe Bewässerung über Script (nutzt ESPHome Sprinkler)
+    - action: script.bewaesserung_stop
+    
+    # Benachrichtigung
+    - action: persistent_notification.create
+      data:
+        title: "Bewässerung Sicherheits-Stop"
+        message: "Bewässerung wurde nach 2 Stunden automatisch gestoppt!"
+        notification_id: bewaesserung_sicherheitsstop
+
+# === END BLOCK: BEWAESSERUNG_SICHERHEITS_STOP ===

@@ -440,3 +440,465 @@ dachluke_duschmodus:
         position: 70
 
 # === END BLOCK: SCRIPT_DACHLUKE_DUSCHMODUS ===
+
+# ============================================================================
+# BEWÄSSERUNGS-SCRIPTS - SMART IRRIGATION INTEGRATION
+# Status: ✅ ERWEITERT - Smart Irrigation Support
+# Geändert: 2025-08-26 - Auto-Modus mit Smart Irrigation
+# ============================================================================
+
+# === BLOCK: BEWAESSERUNG_AUTO ===
+# Zweck: Bewässerung mit Smart Irrigation Werten
+# Status: ✅ KORRIGIERT - Vereinfacht ohne komplexe Variablen
+# Erstellt: 2025-08-26
+# Geändert: 2025-08-26 - Bucket-Reset direkt nach Bewässerung
+# Abhängigkeiten: sensor.smart_irrigation_zone_*, smart_irrigation.reset_bucket
+# WICHTIG: Smart Irrigation liefert Werte in SEKUNDEN!
+
+bewaesserung_auto:
+  alias: "Bewässerung Auto (Smart Irrigation)"
+  description: "Startet Bewässerung mit Zeiten von Smart Irrigation"
+  mode: single
+  sequence:
+    # System-Check
+    - condition: state
+      entity_id: binary_sensor.bewcmp_system_bereit
+      state: 'on'
+    
+    # Hauptschalter einschalten
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bewcmp_bewasserung_hauptschalter
+    
+    # Zone 1 mit Smart Irrigation Zeit (Sekunden zu Minuten)
+    - if:
+        - condition: state
+          entity_id: switch.bewcmp_zone_1_aktiviert
+          state: 'on'
+        - condition: template
+          value_template: >
+            {{ states('sensor.smart_irrigation_zone_1') | float(0) > 0 }}
+      then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.bewcmp_zone_1
+        - delay:
+            minutes: "{{ (states('sensor.smart_irrigation_zone_1') | float(0) / 60) | round(1) }}"
+        - action: switch.turn_off
+          target:
+            entity_id: switch.bewcmp_zone_1
+        # Bucket sofort zurücksetzen nach Bewässerung
+        - action: smart_irrigation.reset_bucket
+          data:
+            entity_id: sensor.smart_irrigation_zone_1
+    
+    # Zone 2 mit Smart Irrigation Zeit (Sekunden zu Minuten)
+    - if:
+        - condition: state
+          entity_id: switch.bewcmp_zone_2_aktiviert
+          state: 'on'
+        - condition: template
+          value_template: >
+            {{ states('sensor.smart_irrigation_zone_2') | float(0) > 0 }}
+      then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.bewcmp_zone_2
+        - delay:
+            minutes: "{{ (states('sensor.smart_irrigation_zone_2') | float(0) / 60) | round(1) }}"
+        - action: switch.turn_off
+          target:
+            entity_id: switch.bewcmp_zone_2
+        # Bucket sofort zurücksetzen nach Bewässerung
+        - action: smart_irrigation.reset_bucket
+          data:
+            entity_id: sensor.smart_irrigation_zone_2
+    
+    # Hauptschalter ausschalten
+    - action: switch.turn_off
+      target:
+        entity_id: switch.bewcmp_bewasserung_hauptschalter
+    
+    # Benachrichtigung wenn fertig
+    - action: persistent_notification.create
+      data:
+        title: "Bewässerung abgeschlossen"
+        message: >
+          Smart Irrigation Bewässerung beendet.
+          Zone 1: {{ (states('sensor.smart_irrigation_zone_1') | float(0) / 60) | round(1) }} Min
+          Zone 2: {{ (states('sensor.smart_irrigation_zone_2') | float(0) / 60) | round(1) }} Min
+        notification_id: bewaesserung_auto_fertig
+
+# === END BLOCK: BEWAESSERUNG_AUTO ===
+
+# === BLOCK: BEWAESSERUNG_STANDARD ===
+# Zweck: Bewässerung mit Standard-Zeiten
+# Status: 🔄 Neu - Eigenständige Implementation
+# Erstellt: 2025-08-26
+# Abhängigkeiten: switch.bewcmp_zone_*, number.bewcmp_zone_*_dauer
+
+bewaesserung_standard:
+  alias: "Bewässerung Standard"
+  description: "Startet Bewässerung mit eingestellten Standard-Zeiten"
+  mode: single
+  sequence:
+    # System-Check
+    - condition: state
+      entity_id: binary_sensor.bewcmp_system_bereit
+      state: 'on'
+    
+    # Hauptschalter einschalten
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bewcmp_bewasserung_hauptschalter
+    
+    # Auto-Sequenz aktivieren
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bewcmp_auto_sequenz
+    
+    # Zone 1 wenn aktiviert
+    - if:
+        - condition: state
+          entity_id: switch.bewcmp_zone_1_aktiviert
+          state: 'on'
+      then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.bewcmp_zone_1
+        - delay:
+            minutes: "{{ states('number.bewcmp_zone_1_dauer') | int }}"
+        - action: switch.turn_off
+          target:
+            entity_id: switch.bewcmp_zone_1
+    
+    # Zone 2 wenn aktiviert
+    - if:
+        - condition: state
+          entity_id: switch.bewcmp_zone_2_aktiviert
+          state: 'on'
+      then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.bewcmp_zone_2
+        - delay:
+            minutes: "{{ states('number.bewcmp_zone_2_dauer') | int }}"
+        - action: switch.turn_off
+          target:
+            entity_id: switch.bewcmp_zone_2
+    
+    # Hauptschalter ausschalten
+    - action: switch.turn_off
+      target:
+        entity_id: switch.bewcmp_bewasserung_hauptschalter
+
+# === END BLOCK: BEWAESSERUNG_STANDARD ===
+
+# === BLOCK: BEWAESSERUNG_VOLLPROGRAMM ===
+# Zweck: Startet kompletten Bewässerungszyklus (identisch mit bewaesserung_standard)
+# Status: ✅ Korrigiert - Direkte Switch-Steuerung
+# Abhängigkeiten: switch.bewcmp_zone_1, switch.bewcmp_zone_2
+
+bewaesserung_vollprogramm:
+  alias: "Bewässerung Vollprogramm"
+  description: "Startet kompletten Zyklus mit allen aktivierten Zonen"
+  mode: single
+  sequence:
+    # Ruft bewaesserung_standard auf (identische Funktion)
+    - action: script.bewaesserung_standard
+
+# === END BLOCK: BEWAESSERUNG_VOLLPROGRAMM ===
+
+# === BLOCK: BEWAESSERUNG_ZONE_1 ===
+# Zweck: Startet nur Zone 1
+# Status: ✅ Korrigiert - Direkte Switch-Steuerung
+
+bewaesserung_zone_1:
+  alias: "Bewässerung Zone 1"
+  description: "Startet nur Zone 1 für angegebene Minuten"
+  mode: restart
+  fields:
+    minuten:
+      description: "Laufzeit in Minuten (Standard: eingestellte Zeit)"
+      example: "15"
+      default: 0
+  sequence:
+    # System-Check
+    - condition: state
+      entity_id: binary_sensor.bewcmp_system_bereit
+      state: 'on'
+    
+    # Zone muss aktiviert sein
+    - condition: state
+      entity_id: switch.bewcmp_zone_1_aktiviert
+      state: 'on'
+    
+    # Hauptschalter einschalten
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bewcmp_bewasserung_hauptschalter
+    
+    # Zone 1 einschalten
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bewcmp_zone_1
+    
+    # Warten
+    - delay:
+        minutes: >
+          {% if minuten | int > 0 %}
+            {{ minuten | int }}
+          {% else %}
+            {{ states('number.bewcmp_zone_1_dauer') | int }}
+          {% endif %}
+    
+    # Zone 1 ausschalten
+    - action: switch.turn_off
+      target:
+        entity_id: switch.bewcmp_zone_1
+    
+    # Hauptschalter ausschalten wenn keine andere Zone läuft
+    - if:
+        - condition: state
+          entity_id: binary_sensor.bewcmp_zone_2_aktiv
+          state: 'off'
+      then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.bewcmp_bewasserung_hauptschalter
+
+# === END BLOCK: BEWAESSERUNG_ZONE_1 ===
+
+# === BLOCK: BEWAESSERUNG_ZONE_2 ===
+# Zweck: Startet nur Zone 2
+# Status: ✅ Korrigiert - Direkte Switch-Steuerung
+
+bewaesserung_zone_2:
+  alias: "Bewässerung Zone 2"
+  description: "Startet nur Zone 2 für angegebene Minuten"
+  mode: restart
+  fields:
+    minuten:
+      description: "Laufzeit in Minuten (Standard: eingestellte Zeit)"
+      example: "15"
+      default: 0
+  sequence:
+    # System-Check
+    - condition: state
+      entity_id: binary_sensor.bewcmp_system_bereit
+      state: 'on'
+    
+    # Zone muss aktiviert sein
+    - condition: state
+      entity_id: switch.bewcmp_zone_2_aktiviert
+      state: 'on'
+    
+    # Hauptschalter einschalten
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bewcmp_bewasserung_hauptschalter
+    
+    # Zone 2 einschalten
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bewcmp_zone_2
+    
+    # Warten
+    - delay:
+        minutes: >
+          {% if minuten | int > 0 %}
+            {{ minuten | int }}
+          {% else %}
+            {{ states('number.bewcmp_zone_2_dauer') | int }}
+          {% endif %}
+    
+    # Zone 2 ausschalten
+    - action: switch.turn_off
+      target:
+        entity_id: switch.bewcmp_zone_2
+    
+    # Hauptschalter ausschalten wenn keine andere Zone läuft
+    - if:
+        - condition: state
+          entity_id: binary_sensor.bewcmp_zone_1_aktiv
+          state: 'off'
+      then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.bewcmp_bewasserung_hauptschalter
+
+# === END BLOCK: BEWAESSERUNG_ZONE_2 ===
+
+# === BLOCK: BEWAESSERUNG_ZONE_1_15MIN ===
+# Zweck: Schnellbewässerung Zone 1 für 15 Minuten
+# Status: ✅ Korrigiert
+
+bewaesserung_zone_1_15min:
+  alias: "Zone 1 - 15 Minuten"
+  description: "Bewässert Zone 1 für 15 Minuten"
+  sequence:
+    - action: script.bewaesserung_zone_1
+      data:
+        minuten: 15
+
+# === END BLOCK: BEWAESSERUNG_ZONE_1_15MIN ===
+
+# === BLOCK: BEWAESSERUNG_ZONE_1_30MIN ===
+# Zweck: Schnellbewässerung Zone 1 für 30 Minuten
+# Status: ✅ Korrigiert
+
+bewaesserung_zone_1_30min:
+  alias: "Zone 1 - 30 Minuten"
+  description: "Bewässert Zone 1 für 30 Minuten"
+  sequence:
+    - action: script.bewaesserung_zone_1
+      data:
+        minuten: 30
+
+# === END BLOCK: BEWAESSERUNG_ZONE_1_30MIN ===
+
+# === BLOCK: BEWAESSERUNG_ZONE_1_60MIN ===
+# Zweck: Schnellbewässerung Zone 1 für 60 Minuten
+# Status: ✅ Korrigiert
+
+bewaesserung_zone_1_60min:
+  alias: "Zone 1 - 60 Minuten"
+  description: "Bewässert Zone 1 für 60 Minuten"
+  sequence:
+    - action: script.bewaesserung_zone_1
+      data:
+        minuten: 60
+
+# === END BLOCK: BEWAESSERUNG_ZONE_1_60MIN ===
+
+# === BLOCK: BEWAESSERUNG_ZONE_2_15MIN ===
+# Zweck: Schnellbewässerung Zone 2 für 15 Minuten
+# Status: ✅ Korrigiert
+
+bewaesserung_zone_2_15min:
+  alias: "Zone 2 - 15 Minuten"
+  description: "Bewässert Zone 2 für 15 Minuten"
+  sequence:
+    - action: script.bewaesserung_zone_2
+      data:
+        minuten: 15
+
+# === END BLOCK: BEWAESSERUNG_ZONE_2_15MIN ===
+
+# === BLOCK: BEWAESSERUNG_ZONE_2_30MIN ===
+# Zweck: Schnellbewässerung Zone 2 für 30 Minuten
+# Status: ✅ Korrigiert
+
+bewaesserung_zone_2_30min:
+  alias: "Zone 2 - 30 Minuten"
+  description: "Bewässert Zone 2 für 30 Minuten"
+  sequence:
+    - action: script.bewaesserung_zone_2
+      data:
+        minuten: 30
+
+# === END BLOCK: BEWAESSERUNG_ZONE_2_30MIN ===
+
+# === BLOCK: BEWAESSERUNG_ZONE_2_60MIN ===
+# Zweck: Schnellbewässerung Zone 2 für 60 Minuten
+# Status: ✅ Korrigiert
+
+bewaesserung_zone_2_60min:
+  alias: "Zone 2 - 60 Minuten"
+  description: "Bewässert Zone 2 für 60 Minuten"
+  sequence:
+    - action: script.bewaesserung_zone_2
+      data:
+        minuten: 60
+
+# === END BLOCK: BEWAESSERUNG_ZONE_2_60MIN ===
+
+# === BLOCK: BEWAESSERUNG_PAUSE ===
+# Zweck: Pausiert laufende Bewässerung
+# Status: ✅ Korrigiert - Nutzt Standby Switch
+
+bewaesserung_pause:
+  alias: "Bewässerung Pausieren"
+  description: "Pausiert die laufende Bewässerung"
+  sequence:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bewcmp_standby_modus
+
+# === END BLOCK: BEWAESSERUNG_PAUSE ===
+
+# === BLOCK: BEWAESSERUNG_RESUME ===
+# Zweck: Setzt pausierte Bewässerung fort
+# Status: ✅ Korrigiert - Deaktiviert Standby
+
+bewaesserung_resume:
+  alias: "Bewässerung Fortsetzen"
+  description: "Setzt die pausierte Bewässerung fort"
+  sequence:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.bewcmp_standby_modus
+
+# === END BLOCK: BEWAESSERUNG_RESUME ===
+
+# === BLOCK: BEWAESSERUNG_STOP ===
+# Zweck: Stoppt Bewässerung komplett
+# Status: ✅ Korrigiert - NOTFALL STOP Button + Switches
+
+bewaesserung_stop:
+  alias: "Bewässerung Stoppen"
+  description: "Stoppt die Bewässerung komplett"
+  sequence:
+    # NOTFALL STOP Button drücken
+    - action: button.press
+      target:
+        entity_id: button.bewcmp_notfall_stop
+    
+    # Sicherheitshalber auch alle Switches aus
+    - action: switch.turn_off
+      target:
+        entity_id:
+          - switch.bewcmp_zone_1
+          - switch.bewcmp_zone_2
+          - switch.bewcmp_bewasserung_hauptschalter
+          - switch.bewcmp_auto_sequenz
+
+# === END BLOCK: BEWAESSERUNG_STOP ===
+
+# === BLOCK: BEWAESSERUNG_NAECHSTE_ZONE ===
+# Zweck: Springt zur nächsten Zone
+# Status: ✅ Korrigiert - Manuelle Umschaltung
+
+bewaesserung_naechste_zone:
+  alias: "Nächste Zone"
+  description: "Springt zur nächsten Zone im Zyklus"
+  sequence:
+    # Wenn Zone 1 läuft -> zu Zone 2
+    - if:
+        - condition: state
+          entity_id: binary_sensor.bewcmp_zone_1_aktiv
+          state: 'on'
+      then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.bewcmp_zone_1
+        - delay: 1
+        - if:
+            - condition: state
+              entity_id: switch.bewcmp_zone_2_aktiviert
+              state: 'on'
+          then:
+            - action: switch.turn_on
+              target:
+                entity_id: switch.bewcmp_zone_2
+    # Wenn Zone 2 läuft -> beenden
+    - if:
+        - condition: state
+          entity_id: binary_sensor.bewcmp_zone_2_aktiv
+          state: 'on'
+      then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.bewcmp_zone_2
+
+# === END BLOCK: BEWAESSERUNG_NAECHSTE_ZONE ===
