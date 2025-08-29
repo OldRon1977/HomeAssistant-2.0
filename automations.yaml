@@ -336,15 +336,15 @@
 # === END BLOCK: AUTOMATION_DACHLUKE_AUTO_CLOSE ===
 
 # === BLOCK: BEWAESSERUNG_ZEITPLAN_1 ===
-# Zweck: Startet Bewässerung nach Zeitplan 1 mit Smart Irrigation Support
-# Status: ✅ Überarbeitet - Smart Irrigation Auto-Modus
+# Zweck: Startet Bewässerung nach Zeitplan 1 - IMMER mit Smart Irrigation
+# Status: ✅ Überarbeitet - Nutzt immer Smart Irrigation
 # Erstellt: 2025-08-25
-# Geändert: 2025-08-26 - Einzelne Wochentage + Auto-Modus
+# Geändert: 2025-08-26 - Immer Smart Irrigation statt choose
 # Abhängigkeiten: script.bewaesserung_auto, sensor.smart_irrigation_zone_*
 
 - id: bewaesserung_zeitplan_1
   alias: "Bewässerung Zeitplan 1"
-  description: "Startet Bewässerung nach Zeitplan 1 mit Smart Irrigation Support"
+  description: "Startet Bewässerung nach Zeitplan 1 - immer mit Smart Irrigation"
   mode: single
   
   triggers:
@@ -380,31 +380,21 @@
         {% endif %}
   
   actions:
-    # Entscheide zwischen Auto-Modus und Standard
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ states('input_select.bewaesserung_zeitplan_1_tage') == 'Auto' }}"
-          sequence:
-            # Auto-Modus: Nutze Smart Irrigation
-            - action: script.bewaesserung_auto
-        
-      # Standard-Modus: Nutze eingestellte Zeiten
-      default:
-        - action: script.bewaesserung_standard
+    # IMMER Smart Irrigation verwenden (mit Bucket-Reset)
+    - action: script.bewaesserung_auto
 
 # === END BLOCK: BEWAESSERUNG_ZEITPLAN_1 ===
 
 # === BLOCK: BEWAESSERUNG_ZEITPLAN_2 ===
-# Zweck: Startet Bewässerung nach Zeitplan 2 mit Smart Irrigation Support
-# Status: ✅ Überarbeitet - Smart Irrigation Auto-Modus
+# Zweck: Startet Bewässerung nach Zeitplan 2 - IMMER mit Smart Irrigation
+# Status: ✅ Überarbeitet - Nutzt immer Smart Irrigation
 # Erstellt: 2025-08-25
-# Geändert: 2025-08-26 - Einzelne Wochentage + Auto-Modus
+# Geändert: 2025-08-26 - Immer Smart Irrigation statt choose
 # Abhängigkeiten: script.bewaesserung_auto, sensor.smart_irrigation_zone_*
 
 - id: bewaesserung_zeitplan_2
   alias: "Bewässerung Zeitplan 2"
-  description: "Startet Bewässerung nach Zeitplan 2 mit Smart Irrigation Support"
+  description: "Startet Bewässerung nach Zeitplan 2 - immer mit Smart Irrigation"
   mode: single
   
   triggers:
@@ -440,18 +430,8 @@
         {% endif %}
   
   actions:
-    # Entscheide zwischen Auto-Modus und Standard
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ states('input_select.bewaesserung_zeitplan_2_tage') == 'Auto' }}"
-          sequence:
-            # Auto-Modus: Nutze Smart Irrigation
-            - action: script.bewaesserung_auto
-        
-      # Standard-Modus: Nutze eingestellte Zeiten
-      default:
-        - action: script.bewaesserung_standard
+    # IMMER Smart Irrigation verwenden (mit Bucket-Reset)
+    - action: script.bewaesserung_auto
 
 # === END BLOCK: BEWAESSERUNG_ZEITPLAN_2 ===
 
